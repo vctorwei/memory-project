@@ -5,7 +5,7 @@ import os
 # 设置页面布局，并默认折叠侧边栏
 st.set_page_config(page_title="深圳记忆", layout="wide", initial_sidebar_state="collapsed")
 
-# 使用 CSS 隐藏 Streamlit 菜单、页脚和标题栏，并调整诗歌方向
+# 使用 CSS 隐藏 Streamlit 菜单、页脚和标题栏
 st.markdown(
     """
     <style>
@@ -24,13 +24,8 @@ st.markdown(
             text-align: center;
             margin-bottom: 20px;
         }
-        /* 让生成的诗歌从右到左排列 */
-        .poem-container {
-            display: flex;
-            flex-direction: row-reverse;
-            gap: 10px;
-        }
         .poem-column {
+            writing-mode: vertical-rl;
             text-align: center;
             font-size: 24px;
             font-weight: bold;
@@ -38,7 +33,6 @@ st.markdown(
             background-color: white;
             padding: 10px;
             display: inline-block;
-            direction: rtl; /* 从右到左显示 */
         }
         .poem-column.first {
             color: red;
@@ -83,15 +77,15 @@ if tab == "深圳记忆":
         if not user_input.strip():
             st.warning("请输入内容后再提交！")
         else:
-            # 读取 Prompt 并替换用户输入
+            # 读取 Prompt 并拼接
             base_prompt = read_prompt()
-            prompt = base_prompt.replace("{USER_INPUT}", user_input)
+            full_prompt = f"**用户输入**：\n{user_input}\n\n{base_prompt}"
 
             try:
                 # 发送 API 请求
                 response = requests.post(
                     API_URL,
-                    json={"model": "gpt-4o", "messages": [{"role": "user", "content": prompt}]},
+                    json={"model": "gpt-4o", "messages": [{"role": "user", "content": full_prompt}]},
                     headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"},
                 )
 
@@ -109,14 +103,14 @@ if tab == "深圳记忆":
 
                 # **显示诗歌**
                 st.subheader("")
-                st.markdown('<div class="poem-container">', unsafe_allow_html=True)
+                cols = st.columns(len(lines))
                 for i, line in enumerate(lines):
-                    text_color = "red" if i == 0 else "black"
-                    st.markdown(
-                        f"<div class='poem-column {'first' if i == 0 else ''}'>{line}</div>",
-                        unsafe_allow_html=True,
-                    )
-                st.markdown('</div>', unsafe_allow_html=True)
+                    with cols[i]:
+                        text_color = "red" if i == 0 else "black"
+                        st.markdown(
+                            f"<div class='poem-column {'first' if i == 0 else ''}'>{line}</div>",
+                            unsafe_allow_html=True,
+                        )
 
             except Exception as e:
                 st.error("请求失败，请稍后重试！")

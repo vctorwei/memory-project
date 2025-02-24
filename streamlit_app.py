@@ -1,6 +1,6 @@
 import streamlit as st
 import requests
-import time
+import os
 
 # 设置页面布局，并隐藏 Streamlit 默认 UI
 st.set_page_config(page_title="深圳记忆", layout="wide")
@@ -64,6 +64,9 @@ st.markdown(
 # **创建左侧 Tab 选择**
 tab = st.sidebar.radio("选择页面", ["深圳记忆", "下载历史"])
 
+# **历史记录文件路径**
+HISTORY_FILE = "history.txt"
+
 # ================== 📌 **Tab 1: 深圳记忆** ==================
 if tab == "深圳记忆":
     # **初始化 Session State**
@@ -71,6 +74,8 @@ if tab == "深圳记忆":
         st.session_state.poem_generated = False
     if "poem_lines" not in st.session_state:
         st.session_state.poem_lines = []
+    if "user_input" not in st.session_state:
+        st.session_state.user_input = ""
 
     # **仅在未生成诗歌时显示输入界面**
     if not st.session_state.poem_generated:
@@ -123,7 +128,12 @@ if tab == "深圳记忆":
                     # **存储到 Session State**
                     st.session_state.poem_generated = True
                     st.session_state.poem_lines = lines
+                    st.session_state.user_input = user_input
 
+                    # **将数据存入 history.txt**
+                    with open(HISTORY_FILE, "a", encoding="utf-8") as file:
+                        file.write(f"\n【用户输入】\n{user_input}\n\n【生成的诗歌】\n{reply}\n")
+                    
                     # **刷新页面，使诗歌显示，输入界面隐藏**
                     st.rerun()
 
@@ -160,15 +170,13 @@ elif tab == "下载历史":
         if password == CORRECT_PASSWORD:
             st.success("✅ 密码正确！您可以下载历史记录。")
 
-            # **模拟历史数据**
-            history_data = "深圳记忆 - 生成历史\n------------------\n1. 我记得夏天的夜晚...\n2. 雨后的街道上..."
-
-            # **创建 history.txt**
-            with open("history.txt", "w", encoding="utf-8") as file:
-                file.write(history_data)
+            # **确保 history.txt 存在**
+            if not os.path.exists(HISTORY_FILE):
+                with open(HISTORY_FILE, "w", encoding="utf-8") as file:
+                    file.write("深圳记忆 - 生成历史记录\n------------------\n")
 
             # **提供下载**
-            with open("history.txt", "rb") as file:
+            with open(HISTORY_FILE, "rb") as file:
                 st.download_button(label="📥 下载历史记录", data=file, file_name="history.txt", mime="text/plain")
         else:
             st.error("❌ 密码错误，请重试！")

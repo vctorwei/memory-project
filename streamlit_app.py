@@ -8,8 +8,21 @@ st.set_page_config(page_title="深圳记忆", layout="wide")
 # **历史记录文件路径**
 HISTORY_FILE = "history.txt"
 
-# **侧边栏 Tab 选择**
-tab = st.radio("📂 选择页面", ["深圳记忆", "下载历史"], horizontal=True)
+# **创建隐藏侧边栏的控制变量**
+if "show_sidebar" not in st.session_state:
+    st.session_state.show_sidebar = False
+
+# **菜单按钮（点击后切换菜单显示状态）**
+col1, col2, col3 = st.columns([1, 2, 1])  # 让按钮居中
+with col2:
+    if st.button("📂 显示菜单" if not st.session_state.show_sidebar else "❌ 隐藏菜单"):
+        st.session_state.show_sidebar = not st.session_state.show_sidebar
+
+# **动态创建侧边栏（仅在状态为 True 时显示）**
+if st.session_state.show_sidebar:
+    tab = st.sidebar.radio("选择页面", ["深圳记忆", "下载历史"])
+else:
+    tab = "深圳记忆"  # 默认进入「深圳记忆」页面
 
 # ================== 📌 **Tab 1: 深圳记忆** ==================
 if tab == "深圳记忆":

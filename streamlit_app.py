@@ -10,21 +10,31 @@ st.set_page_config(page_title="深圳记忆", layout="wide", initial_sidebar_sta
 st.markdown(
     """
     <style>
-        #MainMenu {visibility: hidden;}
-        footer {visibility: hidden;}
-        header {visibility: hidden;}
+        #MainMenu {visibility: hidden;} /* 隐藏 Streamlit 右上角菜单 */
+        footer {visibility: hidden;} /* 隐藏 Streamlit 页脚 */
+        header {visibility: hidden;} /* 隐藏 Streamlit 默认标题栏 */
+        
+        /* 隐藏 Streamlit 页脚中的 GitHub 头像 & Hosted by Streamlit */
+        .st-emotion-cache-0 {display: none !important;}
+        .st-emotion-cache-j7qwjs {display: none !important;}
+
+        /* 调整页面内容，使其更居中 */
         .block-container {
             padding-top: 2rem;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
+
+        /* 标题居中 */
         .title {
             font-size: 40px;
             font-weight: bold;
             text-align: center;
             margin-bottom: 20px;
         }
+
+        /* 让生成的诗歌竖向显示 */
         .poem-column {
             writing-mode: vertical-rl;
             text-align: center;
@@ -35,6 +45,8 @@ st.markdown(
             padding: 10px;
             display: inline-block;
         }
+
+        /* 最右侧的第一列变红 */
         .poem-column.first {
             color: red;
         }

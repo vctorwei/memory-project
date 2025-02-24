@@ -5,36 +5,85 @@ import os
 # 设置页面布局，并隐藏 Streamlit 默认 UI
 st.set_page_config(page_title="深圳记忆", layout="wide")
 
+# 使用 CSS 隐藏 Streamlit 菜单、页脚和标题栏
+st.markdown(
+    """
+    <style>
+        /* 隐藏 Streamlit 右上角菜单 */
+        #MainMenu {visibility: hidden;}
+        
+        /* 隐藏 Streamlit 页脚 */
+        footer {visibility: hidden;}
+        
+        /* 隐藏 Streamlit 默认标题栏 */
+        header {visibility: hidden;}
+        
+        /* 调整页面内容，使其更居中 */
+        .block-container {
+            padding-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 标题居中 */
+        .title {
+            font-size: 40px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* 让生成的诗歌竖向显示 */
+        .poem-column {
+            writing-mode: vertical-rl;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: black;
+            background-color: white;
+            padding: 10px;
+            display: inline-block;
+        }
+
+        /* 最右侧的第一列变红 */
+        .poem-column.first {
+            color: red;
+        }
+
+        /* 提交按钮居中 */
+        .stButton {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # **历史记录文件路径**
 HISTORY_FILE = "history.txt"
 
-# **创建隐藏侧边栏的控制变量**
-if "show_sidebar" not in st.session_state:
-    st.session_state.show_sidebar = False
+# **侧边栏开关**
+toggle_sidebar = st.toggle("📂 显示菜单", value=False)
 
-# **菜单按钮（点击后切换菜单显示状态）**
-col1, col2, col3 = st.columns([1, 2, 1])  # 让按钮居中
-with col2:
-    if st.button("📂 显示菜单" if not st.session_state.show_sidebar else "❌ 隐藏菜单"):
-        st.session_state.show_sidebar = not st.session_state.show_sidebar
-
-# **动态创建侧边栏（仅在状态为 True 时显示）**
-if st.session_state.show_sidebar:
+# **如果用户点击，显示侧边栏，否则隐藏**
+if toggle_sidebar:
     tab = st.sidebar.radio("选择页面", ["深圳记忆", "下载历史"])
 else:
     tab = "深圳记忆"  # 默认进入「深圳记忆」页面
 
 # ================== 📌 **Tab 1: 深圳记忆** ==================
 if tab == "深圳记忆":
-    st.markdown("<h1 style='text-align: center;'>深圳记忆</h1>", unsafe_allow_html=True)
+    st.markdown("<div class='title'>深圳记忆</div>", unsafe_allow_html=True)
 
     # 用户输入框
     user_input = st.text_area("", placeholder="请输入一段记忆...", key="memory_input")
 
-    # **让提交按钮居中**
+    # 让提交按钮居中
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        submit = st.button("📩 提交记忆")
+        submit = st.button("提交")
 
     # **如果用户提交，存入历史**
     if submit and user_input.strip():
@@ -80,7 +129,7 @@ if tab == "深圳记忆":
                 with cols[i]:
                     text_color = "red" if i == 0 else "black"
                     st.markdown(
-                        f"<div style='writing-mode: vertical-rl; text-align: center; font-size: 24px; font-weight: bold; color: {text_color}; background-color: white;'>{line}</div>",
+                        f"<div class='poem-column {'first' if i == 0 else ''}'>{line}</div>",
                         unsafe_allow_html=True,
                     )
 
@@ -90,7 +139,7 @@ if tab == "深圳记忆":
 
 # ================== 📌 **Tab 2: 下载历史** ==================
 elif tab == "下载历史":
-    st.markdown("<h1 style='text-align: center;'>🔐 下载历史</h1>", unsafe_allow_html=True)
+    st.markdown("<div class='title'>🔐 下载历史</div>", unsafe_allow_html=True)
 
     # 设定密码
     CORRECT_PASSWORD = "shenzhen2024"
@@ -101,26 +150,21 @@ elif tab == "下载历史":
     if password == CORRECT_PASSWORD:
         st.success("✅ 密码正确！您可以下载或清空历史记录。")
 
-        # **使用 `st.expander()` 折叠历史管理**
-        with st.expander("📂 管理历史记录", expanded=True):
+        # **确保 history.txt 存在**
+        if not os.path.exists(HISTORY_FILE):
+            with open(HISTORY_FILE, "w", encoding="utf-8") as file:
+                file.write("深圳记忆 - 生成历史记录\n------------------\n")
 
-            # **确保 history.txt 存在**
-            if not os.path.exists(HISTORY_FILE):
-                with open(HISTORY_FILE, "w", encoding="utf-8") as file:
-                    file.write("深圳记忆 - 生成历史记录\n------------------\n")
+        # **提供下载**
+        with open(HISTORY_FILE, "rb") as file:
+            st.download_button("📥 下载历史记录", file, file_name="history.txt")
 
-            # **提供下载**
-            with open(HISTORY_FILE, "rb") as file:
-                st.download_button("📥 下载历史记录", file, file_name="history.txt")
-
-            # **提供清空历史的按钮**
-            colA, colB, colC = st.columns([1, 2, 1])  # 让按钮居中
-            with colB:
-                if st.button("🗑️ 清空历史记录"):
-                    os.remove(HISTORY_FILE)
-                    with open(HISTORY_FILE, "w", encoding="utf-8") as file:
-                        file.write("深圳记忆 - 生成历史记录\n------------------\n")
-                    st.success("✅ 历史记录已清空！")
+        # **提供清空历史的按钮**
+        if st.button("🗑️ 清空历史记录"):
+            os.remove(HISTORY_FILE)
+            with open(HISTORY_FILE, "w", encoding="utf-8") as file:
+                file.write("深圳记忆 - 生成历史记录\n------------------\n")
+            st.success("✅ 历史记录已清空！")
 
     elif password:
         st.error("❌ 密码错误，请重试！")

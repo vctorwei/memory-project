@@ -6,41 +6,43 @@ import json
 # 设置页面布局，并默认折叠侧边栏
 st.set_page_config(page_title="深圳记忆", layout="wide", initial_sidebar_state="collapsed")
 
-# 使用 CSS 优化诗歌样式
+# 使用 CSS 进行优化
 st.markdown(
     """
     <style>
         #MainMenu {visibility: hidden;} /* 隐藏 Streamlit 右上角菜单 */
         header {visibility: hidden;} /* 隐藏 Streamlit 默认标题栏 */
 
-        /* 调整页面内容，使其更居中 */
+        /* 调整页面内容，使其更紧凑 */
         .block-container {
             padding-top: 2rem;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: flex-end; /* 靠右对齐 */
         }
 
-        /* 标题居中 */
+        /* 标题靠右 */
         .title {
             font-size: 40px;
-            font-weight: bold;
-            text-align: center;
+            font-weight: normal;
+            font-family: SimSun, serif; /* 设为宋体 */
+            text-align: right;
             margin-bottom: 20px;
         }
 
         /* 让生成的诗歌竖向显示 */
         .poem-column {
             writing-mode: vertical-rl;
-            text-align: center;
+            text-align: right;
             font-size: 24px;
-            font-weight: bold;
+            font-weight: normal; /* 取消加粗 */
+            font-family: SimSun, serif; /* 设为宋体 */
             color: black;
             background-color: white;
-            padding: 5px; /* 减少上下内边距，使行距更紧凑 */
-            margin: 2px; /* 适当减少行间距 */
+            padding: 2px; /* 减少上下内边距，使行距更紧凑 */
+            margin: 1px; /* 适当减少行间距 */
             display: inline-block;
-            line-height: 1.2; /* 控制行高，使诗歌更紧凑 */
+            line-height: 1; /* 控制行高，使诗歌更紧凑 */
         }
 
         /* 最右侧的第一列变红 */
@@ -82,8 +84,8 @@ if tab == "深圳记忆":
     # 用户输入框
     user_input = st.text_area("", placeholder="请输入一段记忆...", key="memory_input")
 
-    # 让提交按钮居中
-    col1, col2, col3 = st.columns([3, 2, 3])  # 左右两侧列宽大一点，中间列小一点
+    # 让提交按钮靠右
+    col1, col2 = st.columns([6, 2])  # 让右侧列小一些
     with col2:
         submit = st.button("提交", use_container_width=True)  # 让按钮宽度填充列
 
@@ -124,7 +126,6 @@ if tab == "深圳记忆":
                 cols = st.columns(len(lines))  # 创建多列
                 for i, line in enumerate(reversed(lines)):  # 反转顺序，使其从右到左排列
                     with cols[i]:
-                        text_color = "red" if i == len(lines) - 1 else "black"  # 让最右侧列变红
                         st.markdown(
                             f"<div class='poem-column {'first' if i == len(lines) - 1 else ''}'>{line}</div>",
                             unsafe_allow_html=True,

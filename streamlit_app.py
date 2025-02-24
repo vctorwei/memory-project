@@ -5,41 +5,51 @@ import os
 # 设置页面布局，并默认折叠侧边栏
 st.set_page_config(page_title="深圳记忆", layout="wide", initial_sidebar_state="collapsed")
 
-# 使用 CSS 隐藏 Streamlit 菜单、页脚和标题栏，并调整诗歌方向
+# === CSS 代码：调整诗歌显示样式 ===
 st.markdown(
     """
     <style>
         #MainMenu {visibility: hidden;}
         footer {visibility: hidden;}
         header {visibility: hidden;}
+
         .block-container {
             padding-top: 2rem;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
+
         .title {
             font-size: 40px;
             font-weight: bold;
             text-align: center;
             margin-bottom: 20px;
         }
-        /* 让生成的诗歌从右到左排列 */
+
+        /* 让生成的诗歌竖排，从右向左排列 */
         .poem-container {
             display: flex;
-            flex-direction: row-reverse;
+            flex-direction: row-reverse; /* 列从右往左 */
             gap: 10px;
+            justify-content: flex-start;
+            margin-top: 20px;
         }
+
         .poem-column {
-            text-align: center;
+            writing-mode: vertical-rl;   /* 竖排：从上往下，列从右往左 */
+            text-orientation: upright;   /* 保持中文字符正立 */
+            
             font-size: 24px;
             font-weight: bold;
             color: black;
             background-color: white;
             padding: 10px;
             display: inline-block;
-            direction: rtl; /* 从右到左显示 */
+            text-align: center;
         }
+
+        /* 第一列的颜色不同 */
         .poem-column.first {
             color: red;
         }
@@ -111,11 +121,8 @@ if tab == "深圳记忆":
                 st.subheader("")
                 st.markdown('<div class="poem-container">', unsafe_allow_html=True)
                 for i, line in enumerate(lines):
-                    text_color = "red" if i == 0 else "black"
-                    st.markdown(
-                        f"<div class='poem-column {'first' if i == 0 else ''}'>{line}</div>",
-                        unsafe_allow_html=True,
-                    )
+                    column_class = "poem-column first" if i == 0 else "poem-column"
+                    st.markdown(f"<div class='{column_class}'>{line}</div>", unsafe_allow_html=True)
                 st.markdown('</div>', unsafe_allow_html=True)
 
             except Exception as e:

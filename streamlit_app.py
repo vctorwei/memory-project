@@ -5,7 +5,7 @@ import os
 # 设置页面布局，并默认折叠侧边栏
 st.set_page_config(page_title="深圳记忆", layout="wide", initial_sidebar_state="collapsed")
 
-# 使用 CSS 隐藏 Streamlit 菜单、页脚和标题栏
+# 使用 CSS 隐藏 Streamlit 菜单、页脚和标题栏，并调整诗歌方向
 st.markdown(
     """
     <style>
@@ -24,8 +24,13 @@ st.markdown(
             text-align: center;
             margin-bottom: 20px;
         }
+        /* 让生成的诗歌从右到左排列 */
+        .poem-container {
+            display: flex;
+            flex-direction: row-reverse;
+            gap: 10px;
+        }
         .poem-column {
-            writing-mode: vertical-rl;
             text-align: center;
             font-size: 24px;
             font-weight: bold;
@@ -33,6 +38,7 @@ st.markdown(
             background-color: white;
             padding: 10px;
             display: inline-block;
+            direction: rtl; /* 从右到左显示 */
         }
         .poem-column.first {
             color: red;
@@ -103,14 +109,14 @@ if tab == "深圳记忆":
 
                 # **显示诗歌**
                 st.subheader("")
-                cols = st.columns(len(lines))
+                st.markdown('<div class="poem-container">', unsafe_allow_html=True)
                 for i, line in enumerate(lines):
-                    with cols[i]:
-                        text_color = "red" if i == 0 else "black"
-                        st.markdown(
-                            f"<div class='poem-column {'first' if i == 0 else ''}'>{line}</div>",
-                            unsafe_allow_html=True,
-                        )
+                    text_color = "red" if i == 0 else "black"
+                    st.markdown(
+                        f"<div class='poem-column {'first' if i == 0 else ''}'>{line}</div>",
+                        unsafe_allow_html=True,
+                    )
+                st.markdown('</div>', unsafe_allow_html=True)
 
             except Exception as e:
                 st.error("请求失败，请稍后重试！")

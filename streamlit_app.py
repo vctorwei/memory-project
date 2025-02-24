@@ -65,7 +65,7 @@ st.markdown(
 HISTORY_FILE = "history.txt"
 
 # **侧边栏开关**
-toggle_sidebar = st.toggle("📂 显示菜单", value=False)
+toggle_sidebar = st.toggle("📂", value=False)
 
 # **如果用户点击，显示侧边栏，否则隐藏**
 if toggle_sidebar:

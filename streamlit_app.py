@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import os
+import json
 
 # 设置页面布局，并默认折叠侧边栏
 st.set_page_config(page_title="深圳记忆", layout="wide", initial_sidebar_state="collapsed")
@@ -56,6 +57,15 @@ def read_prompt():
             return file.read().strip()
     return "【错误】未找到 prompt.txt，请检查文件是否存在！"
 
+# **函数：保存 JSON 记录**
+def save_to_history(user_input, generated_poem):
+    history_entry = {
+        "user_input": user_input,
+        "generated_poem": generated_poem
+    }
+    with open(HISTORY_FILE, "a", encoding="utf-8") as file:
+        file.write(json.dumps(history_entry, ensure_ascii=False) + "\n")
+
 # ================== 📌 **Tab 1: 深圳记忆** ==================
 if tab == "深圳记忆":
     st.markdown("<div class='title'>深圳记忆</div>", unsafe_allow_html=True)
@@ -97,9 +107,8 @@ if tab == "深圳记忆":
                 processed_text = reply.replace("，", "\n").replace("。", "\n").replace("？", "\n").replace("！", "\n").replace("：", "\n").replace("；", "\n")
                 lines = [line.strip() for line in processed_text.split("\n") if line.strip()]
 
-                # **存储到 history.txt**
-                with open(HISTORY_FILE, "a", encoding="utf-8") as file:
-                    file.write(f"\n【用户输入】\n{user_input}\n\n【生成的诗歌】\n{reply}\n")
+                # **存储到 JSON 格式的 history.txt**
+                save_to_history(user_input, reply)
 
                 # **显示诗歌**
                 st.subheader("")
@@ -132,17 +141,17 @@ elif tab == "下载历史":
         # **确保 history.txt 存在**
         if not os.path.exists(HISTORY_FILE):
             with open(HISTORY_FILE, "w", encoding="utf-8") as file:
-                file.write("深圳记忆 - 生成历史记录\n------------------\n")
+                file.write("")  # 清空文件内容
 
         # **提供下载**
         with open(HISTORY_FILE, "rb") as file:
-            st.download_button(label="📥 下载历史记录", data=file, file_name="history.txt", mime="text/plain")
+            st.download_button(label="📥 下载历史记录 (JSON)", data=file, file_name="history.json", mime="application/json")
 
         # **提供清空历史的按钮**
         if st.button("🗑️ 清空历史记录"):
             os.remove(HISTORY_FILE)  # 删除文件
             with open(HISTORY_FILE, "w", encoding="utf-8") as file:
-                file.write("深圳记忆 - 生成历史记录\n------------------\n")  # 重新创建
+                file.write("")  # 重新创建
             st.success("✅ 历史记录已清空！")
     elif password:
         st.error("❌ 密码错误，请重试！")

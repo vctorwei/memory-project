@@ -60,9 +60,11 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# **定义 Session State**：用于在提交后隐藏输入界面
+# **初始化 Session State**
 if "poem_generated" not in st.session_state:
     st.session_state.poem_generated = False
+if "poem_lines" not in st.session_state:
+    st.session_state.poem_lines = []
 
 # **仅在未生成诗歌时显示输入界面**
 if not st.session_state.poem_generated:
@@ -112,12 +114,12 @@ if not st.session_state.poem_generated:
                 processed_text = reply.replace("，", "\n").replace("。", "\n").replace("？", "\n").replace("！", "\n").replace("：", "\n").replace("；", "\n")
                 lines = [line.strip() for line in processed_text.split("\n") if line.strip()]
 
-                # **切换到生成诗歌的状态**
+                # **存储到 Session State**
                 st.session_state.poem_generated = True
                 st.session_state.poem_lines = lines
 
                 # **刷新页面，使诗歌显示，输入界面隐藏**
-                st.experimental_rerun()
+                st.rerun()
 
             except Exception as e:
                 st.error("请求失败，请稍后重试！")

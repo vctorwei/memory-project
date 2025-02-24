@@ -1,10 +1,10 @@
 import streamlit as st
 import requests
 
-# 设置页面布局，隐藏 Streamlit 的默认 UI
-st.set_page_config(page_title="记忆输入", layout="wide")
+# 设置页面布局，并隐藏 Streamlit 默认 UI
+st.set_page_config(page_title="深圳记忆", layout="wide")
 
-# 使用 CSS 隐藏 Streamlit 菜单、页脚和标题栏
+# 使用 CSS 隐藏 Streamlit 菜单、页脚和标题栏，并居中标题和按钮
 st.markdown(
     """
     <style>
@@ -20,6 +20,17 @@ st.markdown(
         /* 调整页面内容，使其更居中 */
         .block-container {
             padding-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 标题居中 */
+        .title {
+            font-size: 40px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
         }
 
         /* 让生成的诗歌竖向显示 */
@@ -38,23 +49,34 @@ st.markdown(
         .poem-column.first {
             color: red;
         }
+
+        /* 提交按钮居中 */
+        .stButton {
+            display: flex;
+            justify-content: center;
+        }
     </style>
     """,
     unsafe_allow_html=True
 )
 
-# 显示页面标题
-st.title("🌿 记忆输入")
+# 显示居中的标题
+st.markdown("<div class='title'>深圳记忆</div>", unsafe_allow_html=True)
 
 # 用户输入框
-user_input = st.text_area("输入一段记忆", placeholder="请输入内容...")
+user_input = st.text_area("", placeholder="请输入一段记忆...", key="memory_input")
 
 # 读取 API Key（从 Streamlit secrets 读取）
 API_KEY = st.secrets["api"]["key"]
 API_URL = "https://api2.aigcbest.top/v1/chat/completions"
 
+# 让提交按钮居中
+col1, col2, col3 = st.columns([1, 2, 1])  # 让中间的 col2 占比更大，使按钮居中
+with col2:
+    submit = st.button("提交")
+
 # 触发生成
-if st.button("提交"):
+if submit:
     if not user_input.strip():
         st.warning("请输入内容后再提交！")
     else:

@@ -13,24 +13,31 @@ st.markdown(
         #MainMenu {visibility: hidden;} /* 隐藏 Streamlit 右上角菜单 */
         header {visibility: hidden;} /* 隐藏 Streamlit 默认标题栏 */
 
-        /* 调整页面内容，使其更紧凑 */
+        /* 页面整体居中 */
         .block-container {
             padding-top: 2rem;
             display: flex;
             flex-direction: column;
-            align-items: flex-end; /* 靠右对齐 */
+            align-items: center;
         }
 
-        /* 标题靠右 */
+        /* 标题居中 */
         .title {
             font-size: 40px;
             font-weight: normal;
             font-family: SimSun, serif; /* 设为宋体 */
-            text-align: right;
+            text-align: center;
             margin-bottom: 20px;
         }
 
-        /* 让生成的诗歌竖向显示 */
+        /* 诗歌部分靠右 */
+        .poem-container {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end; /* 诗歌靠右对齐 */
+        }
+
+        /* 诗歌内容竖排 */
         .poem-column {
             writing-mode: vertical-rl;
             text-align: right;
@@ -84,8 +91,8 @@ if tab == "深圳记忆":
     # 用户输入框
     user_input = st.text_area("", placeholder="请输入一段记忆...", key="memory_input")
 
-    # 让提交按钮靠右
-    col1, col2 = st.columns([6, 2])  # 让右侧列小一些
+    # 让提交按钮居中
+    col1, col2, col3 = st.columns([3, 2, 3])  # 左右两侧列宽大一点，中间列小一点
     with col2:
         submit = st.button("提交", use_container_width=True)  # 让按钮宽度填充列
 
@@ -123,6 +130,7 @@ if tab == "深圳记忆":
 
                 # **显示诗歌**
                 st.subheader("")
+                st.markdown("<div class='poem-container'>", unsafe_allow_html=True)  # 诗歌整体靠右
                 cols = st.columns(len(lines))  # 创建多列
                 for i, line in enumerate(reversed(lines)):  # 反转顺序，使其从右到左排列
                     with cols[i]:
@@ -130,6 +138,7 @@ if tab == "深圳记忆":
                             f"<div class='poem-column {'first' if i == len(lines) - 1 else ''}'>{line}</div>",
                             unsafe_allow_html=True,
                         )
+                st.markdown("</div>", unsafe_allow_html=True)  # 关闭诗歌容器
 
             except Exception as e:
                 st.error("请求失败，请稍后重试！")

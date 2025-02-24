@@ -6,25 +6,35 @@ import json
 # 设置页面布局，并默认折叠侧边栏
 st.set_page_config(page_title="深圳记忆", layout="wide", initial_sidebar_state="collapsed")
 
-# 使用 CSS 隐藏 Streamlit 菜单、页脚和标题栏
+# 使用 CSS 隐藏 Streamlit 菜单、页脚和标题栏，并优化诗歌样式
 st.markdown(
     """
     <style>
-        #MainMenu {visibility: hidden;}
-        footer {visibility: hidden;}
-        header {visibility: hidden;}
+        #MainMenu {visibility: hidden;} /* 隐藏 Streamlit 右上角菜单 */
+        footer {visibility: hidden;} /* 隐藏 Streamlit 页脚 */
+        header {visibility: hidden;} /* 隐藏 Streamlit 默认标题栏 */
+        
+        /* 隐藏 GitHub 头像 & Hosted by Streamlit */
+        .st-emotion-cache-0 {display: none !important;}
+        .st-emotion-cache-j7qwjs {display: none !important;}
+
+        /* 调整页面内容，使其更居中 */
         .block-container {
             padding-top: 2rem;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
+
+        /* 标题居中 */
         .title {
             font-size: 40px;
             font-weight: bold;
             text-align: center;
             margin-bottom: 20px;
         }
+
+        /* 让生成的诗歌竖向显示 */
         .poem-column {
             writing-mode: vertical-rl;
             text-align: center;
@@ -32,9 +42,13 @@ st.markdown(
             font-weight: bold;
             color: black;
             background-color: white;
-            padding: 10px;
+            padding: 5px; /* 减少上下内边距，使行距更紧凑 */
+            margin: 2px; /* 适当减少行间距 */
             display: inline-block;
+            line-height: 1.2; /* 控制行高，使诗歌更紧凑 */
         }
+
+        /* 最右侧的第一列变红 */
         .poem-column.first {
             color: red;
         }
@@ -74,9 +88,9 @@ if tab == "深圳记忆":
     user_input = st.text_area("", placeholder="请输入一段记忆...", key="memory_input")
 
     # 让提交按钮居中
-    col1, col2, col3 = st.columns([1, 2, 1])
+    col1, col2, col3 = st.columns([3, 2, 3])  # 左右两侧列宽大一点，中间列小一点
     with col2:
-        submit = st.button("提交")
+        submit = st.button("提交", use_container_width=True)  # 让按钮宽度填充列
 
     # 读取 API Key（从 Streamlit secrets 读取）
     API_KEY = st.secrets["api"]["key"]
@@ -120,7 +134,6 @@ if tab == "深圳记忆":
                             f"<div class='poem-column {'first' if i == len(lines) - 1 else ''}'>{line}</div>",
                             unsafe_allow_html=True,
                         )
-
 
             except Exception as e:
                 st.error("请求失败，请稍后重试！")

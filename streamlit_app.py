@@ -3,6 +3,7 @@ import requests
 
 st.set_page_config(page_title="记忆输入", layout="wide")
 
+# 页面标题
 st.title("🌿 记忆输入")
 
 # 用户输入框
@@ -59,7 +60,11 @@ if st.button("提交"):
             cols = st.columns(len(lines))
             for i, line in enumerate(lines):
                 with cols[i]:
-                    st.markdown(f"<div style='writing-mode: vertical-rl; text-align: center; font-size: 24px; font-weight: bold; color: {'red' if i == 0 else 'black'}'>{line}</div>", unsafe_allow_html=True)
+                    text_color = "red" if i == 0 else "black"
+                    st.markdown(
+                        f"<div style='writing-mode: vertical-rl; text-align: center; font-size: 24px; font-weight: bold; color: {text_color}; background-color: white;'>{line}</div>",
+                        unsafe_allow_html=True,
+                    )
 
         except Exception as e:
             st.error("请求失败，请稍后重试！")

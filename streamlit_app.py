@@ -121,9 +121,9 @@ if tab == "深圳记忆":
                 data = response.json()
                 reply = data["choices"][0]["message"]["content"].strip()
 
-                # 处理文本
+                # **去掉多余换行，优化行距**
                 processed_text = reply.replace("，", "\n").replace("。", "\n").replace("？", "\n").replace("！", "\n").replace("：", "\n").replace("；", "\n")
-                lines = [line.strip() for line in processed_text.split("\n") if line.strip()]
+                lines = [line.strip() for line in processed_text.splitlines() if line.strip()]  # 过滤空行
 
                 # **存储到 JSON 格式的 history.txt**
                 save_to_history(user_input, reply)

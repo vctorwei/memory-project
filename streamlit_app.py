@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import time
 
 # 设置页面布局，并隐藏 Streamlit 默认 UI
 st.set_page_config(page_title="深圳记忆", layout="wide")
@@ -60,81 +61,114 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# **初始化 Session State**
-if "poem_generated" not in st.session_state:
-    st.session_state.poem_generated = False
-if "poem_lines" not in st.session_state:
-    st.session_state.poem_lines = []
+# **创建左侧 Tab 选择**
+tab = st.sidebar.radio("选择页面", ["深圳记忆", "下载历史"])
 
-# **仅在未生成诗歌时显示输入界面**
-if not st.session_state.poem_generated:
-    st.markdown("<div class='title'>深圳记忆</div>", unsafe_allow_html=True)
+# ================== 📌 **Tab 1: 深圳记忆** ==================
+if tab == "深圳记忆":
+    # **初始化 Session State**
+    if "poem_generated" not in st.session_state:
+        st.session_state.poem_generated = False
+    if "poem_lines" not in st.session_state:
+        st.session_state.poem_lines = []
 
-    # 用户输入框
-    user_input = st.text_area("", placeholder="请输入一段记忆...", key="memory_input")
+    # **仅在未生成诗歌时显示输入界面**
+    if not st.session_state.poem_generated:
+        st.markdown("<div class='title'>深圳记忆</div>", unsafe_allow_html=True)
 
-    # 让提交按钮居中
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        submit = st.button("提交")
+        # 用户输入框
+        user_input = st.text_area("", placeholder="请输入一段记忆...", key="memory_input")
 
-    # 读取 API Key（从 Streamlit secrets 读取）
-    API_KEY = st.secrets["api"]["key"]
-    API_URL = "https://api2.aigcbest.top/v1/chat/completions"
+        # 让提交按钮居中
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            submit = st.button("提交")
 
-    # 触发生成
-    if submit:
-        if not user_input.strip():
-            st.warning("请输入内容后再提交！")
-        else:
-            # 生成 Prompt
-            prompt = f"""
-            **用户输入**：{user_input}
+        # 读取 API Key（从 Streamlit secrets 读取）
+        API_KEY = st.secrets["api"]["key"]
+        API_URL = "https://api2.aigcbest.top/v1/chat/completions"
 
-            解析用户输入的记忆片段，并生成极简风格的诗歌。风格要求：
-            - **极简主义**：短句、克制的表达、避免冗余。
-            - **画面感**：以具体意象呈现情绪，而非直接表达情感。
-            - **留白**：让读者自行解读诗歌背后的故事和情绪。
-            - **忠于用户输入**：不额外添加复杂修辞或过多形容词。
-            """
+        # 触发生成
+        if submit:
+            if not user_input.strip():
+                st.warning("请输入内容后再提交！")
+            else:
+                # 生成 Prompt
+                prompt = f"""
+                **用户输入**：{user_input}
 
-            try:
-                # 发送 API 请求
-                response = requests.post(
-                    API_URL,
-                    json={"model": "gpt-4o", "messages": [{"role": "user", "content": prompt}]},
-                    headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"},
+                解析用户输入的记忆片段，并生成极简风格的诗歌。风格要求：
+                - **极简主义**：短句、克制的表达、避免冗余。
+                - **画面感**：以具体意象呈现情绪，而非直接表达情感。
+                - **留白**：让读者自行解读诗歌背后的故事和情绪。
+                - **忠于用户输入**：不额外添加复杂修辞或过多形容词。
+                """
+
+                try:
+                    # 发送 API 请求
+                    response = requests.post(
+                        API_URL,
+                        json={"model": "gpt-4o", "messages": [{"role": "user", "content": prompt}]},
+                        headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"},
+                    )
+
+                    # 解析返回结果
+                    data = response.json()
+                    reply = data["choices"][0]["message"]["content"].strip()
+
+                    # 处理文本：按标点分割，并去除标点
+                    processed_text = reply.replace("，", "\n").replace("。", "\n").replace("？", "\n").replace("！", "\n").replace("：", "\n").replace("；", "\n")
+                    lines = [line.strip() for line in processed_text.split("\n") if line.strip()]
+
+                    # **存储到 Session State**
+                    st.session_state.poem_generated = True
+                    st.session_state.poem_lines = lines
+
+                    # **刷新页面，使诗歌显示，输入界面隐藏**
+                    st.rerun()
+
+                except Exception as e:
+                    st.error("请求失败，请稍后重试！")
+                    st.write(e)
+
+    # **如果已经生成诗歌，则仅显示诗歌**
+    else:
+        lines = st.session_state.poem_lines
+
+        # **使用 Streamlit columns 进行竖向排版**
+        cols = st.columns(len(lines))
+        for i, line in enumerate(lines):
+            with cols[i]:
+                text_color = "red" if i == 0 else "black"
+                st.markdown(
+                    f"<div class='poem-column {'first' if i == 0 else ''}'>{line}</div>",
+                    unsafe_allow_html=True,
                 )
 
-                # 解析返回结果
-                data = response.json()
-                reply = data["choices"][0]["message"]["content"].strip()
+# ================== 📌 **Tab 2: 下载历史** ==================
+elif tab == "下载历史":
+    st.markdown("<div class='title'>🔐 下载历史</div>", unsafe_allow_html=True)
 
-                # 处理文本：按标点分割，并去除标点
-                processed_text = reply.replace("，", "\n").replace("。", "\n").replace("？", "\n").replace("！", "\n").replace("：", "\n").replace("；", "\n")
-                lines = [line.strip() for line in processed_text.split("\n") if line.strip()]
+    # 设定密码
+    CORRECT_PASSWORD = "shenzhen2024"
 
-                # **存储到 Session State**
-                st.session_state.poem_generated = True
-                st.session_state.poem_lines = lines
+    # 用户输入密码
+    password = st.text_input("请输入密码", type="password")
 
-                # **刷新页面，使诗歌显示，输入界面隐藏**
-                st.rerun()
+    # **用户输入正确的密码后，显示下载按钮**
+    if password:
+        if password == CORRECT_PASSWORD:
+            st.success("✅ 密码正确！您可以下载历史记录。")
 
-            except Exception as e:
-                st.error("请求失败，请稍后重试！")
-                st.write(e)
+            # **模拟历史数据**
+            history_data = "深圳记忆 - 生成历史\n------------------\n1. 我记得夏天的夜晚...\n2. 雨后的街道上..."
 
-# **如果已经生成诗歌，则仅显示诗歌**
-else:
-    lines = st.session_state.poem_lines
+            # **创建 history.txt**
+            with open("history.txt", "w", encoding="utf-8") as file:
+                file.write(history_data)
 
-    # **使用 Streamlit columns 进行竖向排版**
-    cols = st.columns(len(lines))
-    for i, line in enumerate(lines):
-        with cols[i]:
-            text_color = "red" if i == 0 else "black"
-            st.markdown(
-                f"<div class='poem-column {'first' if i == 0 else ''}'>{line}</div>",
-                unsafe_allow_html=True,
-            )
+            # **提供下载**
+            with open("history.txt", "rb") as file:
+                st.download_button(label="📥 下载历史记录", data=file, file_name="history.txt", mime="text/plain")
+        else:
+            st.error("❌ 密码错误，请重试！")

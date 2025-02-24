@@ -6,17 +6,12 @@ import json
 # 设置页面布局，并默认折叠侧边栏
 st.set_page_config(page_title="深圳记忆", layout="wide", initial_sidebar_state="collapsed")
 
-# 使用 CSS 隐藏 Streamlit 菜单、页脚和标题栏，并优化诗歌样式
+# 使用 CSS 优化诗歌样式
 st.markdown(
     """
     <style>
         #MainMenu {visibility: hidden;} /* 隐藏 Streamlit 右上角菜单 */
-        footer {visibility: hidden;} /* 隐藏 Streamlit 页脚 */
         header {visibility: hidden;} /* 隐藏 Streamlit 默认标题栏 */
-        
-        /* 隐藏 GitHub 头像 & Hosted by Streamlit */
-        .st-emotion-cache-0 {display: none !important;}
-        .st-emotion-cache-j7qwjs {display: none !important;}
 
         /* 调整页面内容，使其更居中 */
         .block-container {

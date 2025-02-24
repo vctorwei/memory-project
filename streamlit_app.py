@@ -112,14 +112,15 @@ if tab == "深圳记忆":
 
                 # **显示诗歌**
                 st.subheader("")
-                cols = st.columns(len(lines))
-                for i, line in enumerate(lines):
+                cols = st.columns(len(lines))  # 创建多列
+                for i, line in enumerate(reversed(lines)):  # 反转顺序，使其从右到左排列
                     with cols[i]:
-                        text_color = "red" if i == 0 else "black"
+                        text_color = "red" if i == len(lines) - 1 else "black"  # 让最右侧列变红
                         st.markdown(
-                            f"<div class='poem-column {'first' if i == 0 else ''}'>{line}</div>",
+                            f"<div class='poem-column {'first' if i == len(lines) - 1 else ''}'>{line}</div>",
                             unsafe_allow_html=True,
                         )
+
 
             except Exception as e:
                 st.error("请求失败，请稍后重试！")

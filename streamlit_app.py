@@ -7,36 +7,46 @@ import random
 # 设置页面布局，并默认折叠侧边栏
 st.set_page_config(page_title="深圳记忆", layout="wide", initial_sidebar_state="collapsed")
 
-# 使用 CSS 进行优化
+# CSS 样式 - 弹幕
 st.markdown(
     """
     <style>
         #MainMenu {visibility: hidden;} /* 隐藏 Streamlit 右上角菜单 */
         header {visibility: hidden;} /* 隐藏 Streamlit 默认标题栏 */
 
-        /* 弹幕样式 */
+        /* 弹幕容器 */
         .barrage-container {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
+            pointer-events: none; /* 让弹幕不会影响点击操作 */
+            overflow: hidden;
         }
-        .barrage {
+
+        /* 每个完整的诗歌块 */
+        .barrage-poem {
             position: absolute;
+            text-align: center;
             font-size: 24px;
             font-weight: bold;
-            white-space: nowrap;
-            animation: moveUp 10s linear infinite;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            padding: 10px;
+            white-space: pre-line;
+            opacity: 1;
+            animation: moveUp 12s linear infinite; /* 统一向上移动 */
         }
+
+        /* 动画：诗歌整体向上移动 */
         @keyframes moveUp {
             from {
                 transform: translateY(100%);
                 opacity: 1;
             }
             to {
-                transform: translateY(-100%);
+                transform: translateY(-150%);
                 opacity: 0;
             }
         }
@@ -156,17 +166,17 @@ elif tab == "诗歌弹幕":
     if not poems:
         st.warning("📌 目前没有历史记录，请先在'深圳记忆'中提交诗歌！")
     else:
-        selected_poem = random.choice(poems)
-        lines = [line.strip() for line in selected_poem.replace("，", "\n").replace("。", "\n").splitlines() if line.strip()]
+        # 选择最多 5 首诗（如果有的话）
+        selected_poems = random.sample(poems, min(len(poems), 5))
 
         # 显示弹幕效果
         st.markdown("<div class='barrage-container'>", unsafe_allow_html=True)
-        for i, line in enumerate(lines):
-            x_pos = random.randint(10, 80)  # 生成随机水平位置
-            speed = random.uniform(5, 10)  # 生成随机移动速度
+        for i, poem in enumerate(selected_poems):
+            x_pos = random.randint(10, 70)  # 生成随机水平位置
+            speed = random.uniform(8, 14)  # 生成随机移动速度
             st.markdown(
                 f"""
-                <div class='barrage' style='left:{x_pos}vw; animation-duration: {speed}s;'>{line}</div>
+                <div class='barrage-poem' style='left:{x_pos}vw; animation-duration: {speed}s;'>{poem}</div>
                 """,
                 unsafe_allow_html=True,
             )

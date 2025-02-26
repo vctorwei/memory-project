@@ -86,9 +86,9 @@ if tab == "深圳记忆":
         .title {
             font-family: SimHei, sans-serif;
             font-size: 20px; /* 字号稍小 */
-            font-weight: bold;
             color: #666; /* 灰色字体 */
             text-align: center;
+            font-weight: normal; /* 去掉加粗 */
         }
         /* 让输入框整体（包含虚线框）居中 */
         div[data-testid="stTextArea"] {
@@ -123,8 +123,8 @@ if tab == "深圳记忆":
             margin-top: 10px;
         }
         div[data-testid="stButton"] button {
-            width: 60px; /* 按钮大小 */
-            height: 60px;
+            width: 32px; /* 按钮宽度变小 */
+            height: 32px; /* 按钮高度只比字体高一倍 */
             border-radius: 50%; /* 圆形按钮 */
             background-color: #bbb !important; /* 灰色 */
             color: white !important;
@@ -133,6 +133,7 @@ if tab == "深圳记忆":
             border: none;
             cursor: pointer;
             text-align: center;
+            line-height: 16px; /* 让字体居中 */
         }
         /* 让 Home 和 家 居中 */
         .home-text {
@@ -144,6 +145,7 @@ if tab == "深圳记忆":
         }
         </style>
         <div class='title'>关于你的深圳记忆<br>About Your Shenzhen Memory</div>
+        <br><br><br> <!-- 增加三行空行 -->
         """,
         unsafe_allow_html=True
     )
@@ -172,6 +174,7 @@ if tab == "深圳记忆":
         """,
         unsafe_allow_html=True
     )
+
 
 
     API_KEY = st.secrets["api"]["key"]

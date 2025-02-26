@@ -99,12 +99,12 @@ if tab == "深圳记忆":
             justify-content: center; /* 居中按钮 */
             margin-top: 10px;
         }
-        .custom-button {
+        div[data-testid="stButton"] button {
             width: 60px; /* 按钮大小 */
             height: 60px;
             border-radius: 50%; /* 圆形按钮 */
-            background-color: #bbb; /* 灰色 */
-            color: white;
+            background-color: #bbb !important; /* 灰色 */
+            color: white !important;
             font-weight: bold;
             font-size: 16px;
             border: none;
@@ -120,12 +120,12 @@ if tab == "深圳记忆":
     user_input = st.text_area("", placeholder="输入 Type", key="memory_input")
 
     # 让提交按钮真正居中
-    st.markdown('<div class="button-container"><button class="custom-button">OK</button></div>', unsafe_allow_html=True)
+    col1, col2, col3 = st.columns([3, 2, 3])
+    with col2:
+        submit = st.button("OK")  # 这个会触发 if submit:
 
     API_KEY = st.secrets["api"]["key"]
     API_URL = "https://api2.aigcbest.top/v1/chat/completions"
-
-
 
     if submit:
         if not user_input.strip():

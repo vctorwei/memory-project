@@ -80,32 +80,52 @@ def load_poetry_history():
 
 # ================== 📌 **Tab 1: 深圳记忆** ==================
 if tab == "深圳记忆":
+if tab == "深圳记忆":
     st.markdown(
-    """
-    <style>
-    .title {
-        font-family: SimHei, sans-serif;
-        font-size: 24px;
-        font-weight: bold;
-        text-align: center;
-    }
-    </style>
-    <div class='title'>关于你的深圳记忆<br>About Your Shenzhen Memory</div>
-    """,
-    unsafe_allow_html=True
+        """
+        <style>
+        .title {
+            font-family: SimHei, sans-serif;
+            font-size: 20px; /* 调小字号 */
+            font-weight: bold;
+            color: #666; /* 灰色字体 */
+            text-align: center;
+        }
+        .custom-input textarea {
+            text-align: center; /* 输入框文字居中 */
+            font-family: SimHei, sans-serif;
+        }
+        .custom-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 60px; /* 按钮大小 */
+            height: 60px;
+            border-radius: 50%; /* 圆形按钮 */
+            background-color: #bbb; /* 灰色 */
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+        }
+        </style>
+        <div class='title'>关于你的深圳记忆<br>About Your Shenzhen Memory</div>
+        """,
+        unsafe_allow_html=True
     )
 
-
-    # 用户输入框
-    user_input = st.text_area("", placeholder="请输入一段记忆...", key="memory_input")
+    # 用户输入框（带居中 CSS）
+    user_input = st.text_area("", placeholder="输入 Type", key="memory_input", help="请输入一段记忆...")
 
     # 让提交按钮居中
     col1, col2, col3 = st.columns([3, 2, 3])  
     with col2:
-        submit = st.button("提交", use_container_width=True)  
+        submit = st.markdown('<button class="custom-button">OK</button>', unsafe_allow_html=True)
 
     API_KEY = st.secrets["api"]["key"]
     API_URL = "https://api2.aigcbest.top/v1/chat/completions"
+
 
     if submit:
         if not user_input.strip():

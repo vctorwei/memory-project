@@ -90,9 +90,13 @@ if tab == "深圳记忆":
             color: #666; /* 灰色字体 */
             text-align: center;
         }
-        .custom-input textarea {
+        /* 自定义输入框 */
+        div[data-testid="stTextArea"] textarea {
             text-align: center; /* 输入框文字居中 */
             font-family: SimHei, sans-serif;
+            border: 2px dashed #bbb !important; /* 添加虚线边框 */
+            padding: 10px; /* 增加内边距 */
+            border-radius: 5px; /* 轻微圆角 */
         }
         .button-container {
             display: flex;
@@ -117,7 +121,7 @@ if tab == "深圳记忆":
         unsafe_allow_html=True
     )
 
-    # 用户输入框（去掉问号）
+    # 用户输入框（虚线框）
     user_input = st.text_area("", placeholder="输入 Type", key="memory_input")
 
     # 让提交按钮真正居中
@@ -132,6 +136,7 @@ if tab == "深圳记忆":
     """, unsafe_allow_html=True)
     
     submit = st.button("OK")
+
 
 
     API_KEY = st.secrets["api"]["key"]

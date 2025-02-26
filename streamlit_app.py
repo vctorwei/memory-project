@@ -80,7 +80,21 @@ def load_poetry_history():
 
 # ================== 📌 **Tab 1: 深圳记忆** ==================
 if tab == "深圳记忆":
-    st.markdown("<div class='title'>深圳记忆</div>", unsafe_allow_html=True)
+    st.markdown(
+    """
+    <style>
+    .title {
+        font-family: SimHei, sans-serif;
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+    }
+    </style>
+    <div class='title'>关于你的深圳记忆<br>About Your Shenzhen Memory</div>
+    """,
+    unsafe_allow_html=True
+    )
+
 
     # 用户输入框
     user_input = st.text_area("", placeholder="请输入一段记忆...", key="memory_input")

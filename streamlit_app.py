@@ -80,15 +80,57 @@ def load_poetry_history():
 
 # ================== 📌 **Tab 1: 深圳记忆** ==================
 if tab == "深圳记忆":
-    st.markdown("<div class='title'>深圳记忆</div>", unsafe_allow_html=True)
+    st.markdown("""
+        <div style="text-align: center; font-size: 24px; font-weight: bold;">
+            关于你的深圳记忆<br>About Your Shenzhen Memory
+        </div>
+    """, unsafe_allow_html=True)
 
-    # 用户输入框
-    user_input = st.text_area("", placeholder="请输入一段记忆...", key="memory_input")
+    # 空两行
+    st.markdown("<br><br>", unsafe_allow_html=True)
 
-    # 让提交按钮居中
-    col1, col2, col3 = st.columns([3, 2, 3])  
-    with col2:
-        submit = st.button("提交", use_container_width=True)  
+    # 虚线输入框
+    st.markdown("""
+        <div style="
+            border: 2px dashed #ccc;
+            padding: 10px;
+            text-align: center;
+            width: 80%;
+            margin: auto;
+            border-radius: 5px;
+        ">
+            <input type="text" placeholder="输入 Type" 
+                style="border: none; outline: none; width: 100%; text-align: center; font-size: 16px;">
+        </div>
+    """, unsafe_allow_html=True)
+
+    # 空两行
+    st.markdown("<br><br>", unsafe_allow_html=True)
+
+    # 圆形按钮
+    st.markdown("""
+        <div style="text-align: center;">
+            <button style="
+                background-color: #d3d3d3;
+                border: none;
+                border-radius: 50%;
+                width: 60px;
+                height: 60px;
+                font-size: 16px;
+                cursor: pointer;
+            ">OK</button>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # 空两行
+    st.markdown("<br><br>", unsafe_allow_html=True)
+
+    # Home / 家
+    st.markdown("""
+        <div style="text-align: center; font-size: 18px;">
+            Home<br>家
+        </div>
+    """, unsafe_allow_html=True)
 
     API_KEY = st.secrets["api"]["key"]
     API_URL = "https://api2.aigcbest.top/v1/chat/completions"

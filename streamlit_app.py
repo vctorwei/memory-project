@@ -85,7 +85,7 @@ if tab == "深圳记忆":
         <style>
         .title {
             font-family: SimHei, sans-serif;
-            font-size: 20px; /* 调小字号 */
+            font-size: 20px; /* 字号稍小 */
             font-weight: bold;
             color: #666; /* 灰色字体 */
             text-align: center;
@@ -94,10 +94,12 @@ if tab == "深圳记忆":
             text-align: center; /* 输入框文字居中 */
             font-family: SimHei, sans-serif;
         }
-        .custom-button {
+        .button-container {
             display: flex;
-            justify-content: center;
-            align-items: center;
+            justify-content: center; /* 居中按钮 */
+            margin-top: 10px;
+        }
+        .custom-button {
             width: 60px; /* 按钮大小 */
             height: 60px;
             border-radius: 50%; /* 圆形按钮 */
@@ -114,16 +116,15 @@ if tab == "深圳记忆":
         unsafe_allow_html=True
     )
 
-    # 用户输入框（带居中 CSS）
-    user_input = st.text_area("", placeholder="输入 Type", key="memory_input", help="请输入一段记忆...")
+    # 用户输入框（去掉问号）
+    user_input = st.text_area("", placeholder="输入 Type", key="memory_input")
 
-    # 让提交按钮居中
-    col1, col2, col3 = st.columns([3, 2, 3])  
-    with col2:
-        submit = st.markdown('<button class="custom-button">OK</button>', unsafe_allow_html=True)
+    # 让提交按钮真正居中
+    st.markdown('<div class="button-container"><button class="custom-button">OK</button></div>', unsafe_allow_html=True)
 
     API_KEY = st.secrets["api"]["key"]
     API_URL = "https://api2.aigcbest.top/v1/chat/completions"
+
 
 
     if submit:

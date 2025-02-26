@@ -256,39 +256,34 @@ elif tab == "诗歌弹幕":
         num_poems = min(len(poems), 10)  # 最多 10 条弹幕
         screen_width = 95  # 屏幕宽度范围（vw）
         screen_height = 90  # 屏幕高度范围（vh）
-    
-        # 计算均匀分布的起始点
-        spacing_x = screen_width // num_poems  # 计算横向间距
-        spacing_y = screen_height // num_poems  # 计算纵向间距
-    
-        used_positions = set()  # 存储已经使用的坐标
+
+        used_positions = []  # 存储已经使用的 y 轴位置
     
         st.markdown("<div class='barrage-container'>", unsafe_allow_html=True)
     
         for i, poem in enumerate(random.sample(poems, num_poems)):
-            # 计算大致均匀的位置
-            base_x = i * spacing_x + random.randint(-10, 10)  # 允许小范围偏移
-            base_y = i * spacing_y + random.randint(-10, 10)
-    
-            # 确保不会超出屏幕边界
-            x_pos = max(5, min(base_x, screen_width - 5))
-            y_pos = max(5, min(base_y, screen_height - 5))
-    
-            # 防止过度重叠（若位置太接近，则重新计算）
-            while (x_pos, y_pos) in used_positions:
-                x_pos += random.randint(-5, 5)
-                y_pos += random.randint(-5, 5)
-            used_positions.add((x_pos, y_pos))  # 记录已使用的位置
-    
-            speed = random.uniform(25, 45)  # 弹幕速度
-            opacity = random.uniform(0.6, 1)  # 透明度
             font_size = random.randint(18, 26)  # 文字大小
+            line_height = font_size * 1.2 / 10  # 换算成 vh 单位
+            spacing_y = max(5, line_height * 1.5)  # 计算间距，避免重叠
     
+            # 随机一个初始 y 位置，确保不会与之前的弹幕重叠太多
+            attempts = 0
+            while attempts < 10:
+                base_y = random.uniform(5, screen_height - 5)
+                if all(abs(base_y - pos) > spacing_y for pos in used_positions):
+                    used_positions.append(base_y)
+                    break
+                attempts += 1
+
+            base_x = random.randint(10, 20)  # 让弹幕从左侧随机一点出现
+            speed = random.uniform(25, 45) + (spacing_y * 0.5)  # 让高的弹幕稍微快一点
+            opacity = random.uniform(0.6, 1)
+
             st.markdown(
                 f"""
                 <div class='barrage-poem' style='
-                    left:{x_pos}vw; 
-                    top:{y_pos}vh; 
+                    left:{base_x}vw; 
+                    top:{base_y}vh; 
                     animation-duration: {speed}s; 
                     opacity: {opacity}; 
                     font-size: {font_size}px;
@@ -299,5 +294,5 @@ elif tab == "诗歌弹幕":
                 """,
                 unsafe_allow_html=True,
             )
-    
+
         st.markdown("</div>", unsafe_allow_html=True)

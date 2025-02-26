@@ -32,15 +32,17 @@ st.markdown(
             margin-bottom: 40px;
         }
 
-        /* 输入框样式 */
+        /* 虚线输入框样式 */
         .dashed-input input {
             border: 2px dashed gray !important;
             padding: 12px;
             text-align: center;
             font-size: 16px;
-            width: 100%;
+            width: 300px;
             border-radius: 5px;
             font-family: "SimHei", sans-serif;
+            margin: 0 auto;
+            display: block;
         }
 
         /* 居中输入框 */
@@ -57,10 +59,10 @@ st.markdown(
             align-items: center;
             margin-top: 10px;
         }
-        
+
         .circle-button button {
-            border-radius: 50%; /* 让按钮成为圆形 */
-            width: 60px; /* 设定固定宽高 */
+            border-radius: 50%;
+            width: 60px;
             height: 60px;
             background-color: gray;
             border: none;
@@ -74,7 +76,6 @@ st.markdown(
             align-items: center;
         }
 
-
         /* 居中文本 */
         .center-text {
             text-align: center;
@@ -83,38 +84,6 @@ st.markdown(
             font-weight: bold;
             color: gray;
             font-family: "SimHei", sans-serif;
-        }
-
-        /* 弹幕容器 */
-        .barrage-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        /* 弹幕动画 */
-        .barrage-poem {
-            position: absolute;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: black;
-            font-family: "SimHei", sans-serif;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 8px;
-            padding: 10px;
-            white-space: pre-line;
-            opacity: 1;
-            animation: moveUp 12s linear infinite;
-        }
-
-        @keyframes moveUp {
-            from { transform: translateY(100%); opacity: 1; }
-            to { transform: translateY(-150%); opacity: 0; }
         }
     </style>
     """,

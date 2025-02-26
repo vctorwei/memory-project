@@ -257,36 +257,37 @@ elif tab == "诗歌弹幕":
         screen_width = 95  # 屏幕宽度范围（vw）
         screen_height = 90  # 屏幕高度范围（vh）
     
-        # 计算最大可用的弹幕高度
-        min_font_size = 18
-        max_font_size = 26
-        max_lines = screen_height // (max_font_size * 1.5 / 10)  # 计算屏幕可容纳的最大行数
+        # 计算均匀分布的起始点
+        spacing_x = screen_width // num_poems  # 计算横向间距
+        spacing_y = screen_height // num_poems  # 计算纵向间距
     
-        # 创建可用的 y 轴位置列表
-        available_slots = list(range(5, screen_height - 5, int(screen_height / max_lines)))
-        random.shuffle(available_slots)  # 随机打乱，避免总是固定间距
+        used_positions = set()  # 存储已经使用的坐标
     
         st.markdown("<div class='barrage-container'>", unsafe_allow_html=True)
     
         for i, poem in enumerate(random.sample(poems, num_poems)):
-            font_size = random.randint(min_font_size, max_font_size)  # 随机字体大小
-            spacing_y = font_size * 1.5 / 10  # 计算基于字体大小的间距（vh单位）
-
-            # 确保 y 轴不会重叠
-            if available_slots:
-                y_pos = available_slots.pop(0)  # 取出一个不重叠的位置
-            else:
-                y_pos = random.uniform(5, screen_height - 5)  # 兜底
-
-            # 让 x 轴起点错开，避免视觉重叠
-            base_x = random.randint(10, 30)
-            speed = random.uniform(25, 45)
-            opacity = random.uniform(0.6, 1)
-
+            # 计算大致均匀的位置
+            base_x = i * spacing_x + random.randint(-10, 10)  # 允许小范围偏移
+            base_y = i * spacing_y + random.randint(-10, 10)
+    
+            # 确保不会超出屏幕边界
+            x_pos = max(5, min(base_x, screen_width - 5))
+            y_pos = max(5, min(base_y, screen_height - 5))
+    
+            # 防止过度重叠（若位置太接近，则重新计算）
+            while (x_pos, y_pos) in used_positions:
+                x_pos += random.randint(-5, 5)
+                y_pos += random.randint(-5, 5)
+            used_positions.add((x_pos, y_pos))  # 记录已使用的位置
+    
+            speed = random.uniform(25, 45)  # 弹幕速度
+            opacity = random.uniform(0.6, 1)  # 透明度
+            font_size = random.randint(18, 26)  # 文字大小
+    
             st.markdown(
                 f"""
                 <div class='barrage-poem' style='
-                    left:{base_x}vw; 
+                    left:{x_pos}vw; 
                     top:{y_pos}vh; 
                     animation-duration: {speed}s; 
                     opacity: {opacity}; 
@@ -298,5 +299,5 @@ elif tab == "诗歌弹幕":
                 """,
                 unsafe_allow_html=True,
             )
-
+    
         st.markdown("</div>", unsafe_allow_html=True)

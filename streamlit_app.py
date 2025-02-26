@@ -96,15 +96,15 @@ if tab == "深圳记忆":
         }
         .button-container {
             display: flex;
-            justify-content: center; /* 确保按钮居中 */
+            justify-content: center; /* 居中按钮 */
             margin-top: 10px;
         }
-        .custom-button {
+        div[data-testid="stButton"] button {
             width: 60px; /* 按钮大小 */
             height: 60px;
             border-radius: 50%; /* 圆形按钮 */
-            background-color: #bbb; /* 灰色 */
-            color: white;
+            background-color: #bbb !important; /* 灰色 */
+            color: white !important;
             font-weight: bold;
             font-size: 16px;
             border: none;
@@ -117,28 +117,18 @@ if tab == "深圳记忆":
         unsafe_allow_html=True
     )
 
-    # 用户输入框
+    # 用户输入框（去掉问号）
     user_input = st.text_area("", placeholder="输入 Type", key="memory_input")
 
-    # 自定义按钮，使用 st.markdown 并监听点击事件
-    button_html = """
-    <div class="button-container">
-        <form action="" method="post">
-            <input type="hidden" name="button_click" value="1">
-            <button type="submit" class="custom-button">OK</button>
-        </form>
-    </div>
-    """
-    st.markdown(button_html, unsafe_allow_html=True)
+    # 让提交按钮真正居中
+    col1, col2, col3 = st.columns([3, 2, 3])  # 让按钮在中间的列
+    with col2:
+        submit = st.button("OK")  # 这个会触发 if submit:
 
-    # 监听按钮点击
-    if "button_clicked" not in st.session_state:
-        st.session_state.button_clicked = False
+    API_KEY = st.secrets["api"]["key"]
+    API_URL = "https://api2.aigcbest.top/v1/chat/completions"
 
-    if st.form_submit_button("OK"):
-        st.session_state.button_clicked = True
-
-    if st.session_state.button_clicked:
+    if submit:  # 监听按钮点击事件
         if not user_input.strip():
             st.warning("请输入内容后再提交！")
         else:
@@ -177,6 +167,7 @@ if tab == "深圳记忆":
             except Exception as e:
                 st.error("请求失败，请稍后重试！")
                 st.write(e)
+
 
 
 # ================== 📌 **Tab 2: 下载历史** ==================

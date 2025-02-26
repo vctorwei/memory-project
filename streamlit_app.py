@@ -18,13 +18,17 @@ st.markdown(
             text-align: center;
             font-size: 32px;
             font-weight: bold;
+            color: gray;
+            font-family: "SimHei", sans-serif;
             margin-bottom: 5px;
         }
 
         .subtitle {
             text-align: center;
-            font-size: 20px;
+            font-size: 32px;
+            font-weight: bold;
             color: gray;
+            font-family: "SimHei", sans-serif;
             margin-bottom: 40px;
         }
 
@@ -36,6 +40,7 @@ st.markdown(
             font-size: 16px;
             width: 100%;
             border-radius: 5px;
+            font-family: "SimHei", sans-serif;
         }
 
         /* 居中输入框 */
@@ -56,10 +61,12 @@ st.markdown(
             border-radius: 50%;
             width: 60px;
             height: 60px;
-            background-color: #D3D3D3;
+            background-color: gray;
             border: none;
             font-size: 18px;
             font-weight: bold;
+            color: white;
+            font-family: "SimHei", sans-serif;
             cursor: pointer;
         }
 
@@ -69,6 +76,8 @@ st.markdown(
             font-size: 24px;
             margin-top: 30px;
             font-weight: bold;
+            color: gray;
+            font-family: "SimHei", sans-serif;
         }
 
         /* 弹幕容器 */
@@ -88,6 +97,8 @@ st.markdown(
             text-align: center;
             font-size: 24px;
             font-weight: bold;
+            color: black;
+            font-family: "SimHei", sans-serif;
             background: rgba(255, 255, 255, 0.8);
             border-radius: 8px;
             padding: 10px;
@@ -153,40 +164,6 @@ if tab == "深圳记忆":
     # Home & 家
     st.markdown("<div class='center-text'>Home</div>", unsafe_allow_html=True)
     st.markdown("<div class='center-text'>家</div>", unsafe_allow_html=True)
-
-    # API 交互逻辑
-    API_KEY = st.secrets["api"]["key"]
-    API_URL = "https://api2.aigcbest.top/v1/chat/completions"
-
-    if user_input:
-        base_prompt = read_prompt()
-        full_prompt = f"**用户输入**：\n{user_input}\n\n{base_prompt}"
-
-        try:
-            response = requests.post(
-                API_URL,
-                json={"model": "gpt-4o", "messages": [{"role": "user", "content": full_prompt}]},
-                headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"},
-            )
-            data = response.json()
-            reply = data["choices"][0]["message"]["content"].strip()
-
-            # 处理文本
-            processed_text = reply.replace("，", "\n").replace("。", "\n").replace("？", "\n").replace("！", "\n")
-            lines = [line.strip() for line in processed_text.splitlines() if line.strip()]
-
-            # 存储历史记录
-            with open(HISTORY_FILE, "a", encoding="utf-8") as file:
-                file.write(json.dumps({"user_input": user_input, "generated_poem": reply}, ensure_ascii=False) + "\n")
-
-            # **显示诗歌**
-            st.subheader("生成的诗歌")
-            for line in lines:
-                st.write(line)
-
-        except Exception as e:
-            st.error("请求失败，请稍后重试！")
-            st.write(e)
 
 # ================== 📌 **Tab 2: 下载历史** ==================
 elif tab == "下载历史":

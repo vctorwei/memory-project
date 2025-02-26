@@ -256,34 +256,38 @@ elif tab == "诗歌弹幕":
         num_poems = min(len(poems), 10)  # 最多 10 条弹幕
         screen_width = 95  # 屏幕宽度范围（vw）
         screen_height = 90  # 屏幕高度范围（vh）
-
-        used_positions = []  # 存储已经使用的 y 轴位置
+    
+        # 计算最大可用的弹幕高度
+        min_font_size = 18
+        max_font_size = 26
+        max_lines = screen_height // (max_font_size * 1.5 / 10)  # 计算屏幕可容纳的最大行数
+    
+        # 创建可用的 y 轴位置列表
+        available_slots = list(range(5, screen_height - 5, int(screen_height / max_lines)))
+        random.shuffle(available_slots)  # 随机打乱，避免总是固定间距
     
         st.markdown("<div class='barrage-container'>", unsafe_allow_html=True)
     
         for i, poem in enumerate(random.sample(poems, num_poems)):
-            font_size = random.randint(18, 26)  # 文字大小
-            line_height = font_size * 1.2 / 10  # 换算成 vh 单位
-            spacing_y = max(5, line_height * 1.5)  # 计算间距，避免重叠
-    
-            # 随机一个初始 y 位置，确保不会与之前的弹幕重叠太多
-            attempts = 0
-            while attempts < 10:
-                base_y = random.uniform(5, screen_height - 5)
-                if all(abs(base_y - pos) > spacing_y for pos in used_positions):
-                    used_positions.append(base_y)
-                    break
-                attempts += 1
+            font_size = random.randint(min_font_size, max_font_size)  # 随机字体大小
+            spacing_y = font_size * 1.5 / 10  # 计算基于字体大小的间距（vh单位）
 
-            base_x = random.randint(10, 20)  # 让弹幕从左侧随机一点出现
-            speed = random.uniform(25, 45) + (spacing_y * 0.5)  # 让高的弹幕稍微快一点
+            # 确保 y 轴不会重叠
+            if available_slots:
+                y_pos = available_slots.pop(0)  # 取出一个不重叠的位置
+            else:
+                y_pos = random.uniform(5, screen_height - 5)  # 兜底
+
+            # 让 x 轴起点错开，避免视觉重叠
+            base_x = random.randint(10, 30)
+            speed = random.uniform(25, 45)
             opacity = random.uniform(0.6, 1)
 
             st.markdown(
                 f"""
                 <div class='barrage-poem' style='
                     left:{base_x}vw; 
-                    top:{base_y}vh; 
+                    top:{y_pos}vh; 
                     animation-duration: {speed}s; 
                     opacity: {opacity}; 
                     font-size: {font_size}px;

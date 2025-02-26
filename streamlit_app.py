@@ -253,30 +253,51 @@ elif tab == "诗歌弹幕":
     if not poems:
         st.warning("📌 目前没有历史记录，请先在'深圳记忆'中提交诗歌！")
     else:
-        selected_poems = random.sample(poems, min(len(poems), 5))  # 最多 5 首诗
-        top_spacing = 20  # 每首诗间隔 20vh，防止重叠
-
-        # 显示弹幕效果
+        num_poems = min(len(poems), 10)  # 最多 10 条弹幕
+        screen_width = 95  # 屏幕宽度范围（vw）
+        screen_height = 90  # 屏幕高度范围（vh）
+    
+        # 计算均匀分布的起始点
+        spacing_x = screen_width // num_poems  # 计算横向间距
+        spacing_y = screen_height // num_poems  # 计算纵向间距
+    
+        used_positions = set()  # 存储已经使用的坐标
+    
         st.markdown("<div class='barrage-container'>", unsafe_allow_html=True)
-        for i, poem in enumerate(selected_poems):
-            x_pos = random.randint(5, 95)  # 随机水平位置
-            speed = random.uniform(16, 28)  # 速度
-            top_position = i * top_spacing  # 计算初始位置，防止重叠
-            align = "left" if x_pos < 30 else "right" if x_pos > 60 else "center"  # 对齐方式
-
+    
+        for i, poem in enumerate(random.sample(poems, num_poems)):
+            # 计算大致均匀的位置
+            base_x = i * spacing_x + random.randint(-10, 10)  # 允许小范围偏移
+            base_y = i * spacing_y + random.randint(-10, 10)
+    
+            # 确保不会超出屏幕边界
+            x_pos = max(5, min(base_x, screen_width - 5))
+            y_pos = max(5, min(base_y, screen_height - 5))
+    
+            # 防止过度重叠（若位置太接近，则重新计算）
+            while (x_pos, y_pos) in used_positions:
+                x_pos += random.randint(-5, 5)
+                y_pos += random.randint(-5, 5)
+            used_positions.add((x_pos, y_pos))  # 记录已使用的位置
+    
+            speed = random.uniform(10, 25)  # 弹幕速度
+            opacity = random.uniform(0.6, 1)  # 透明度
+            font_size = random.randint(18, 26)  # 文字大小
+    
             st.markdown(
                 f"""
                 <div class='barrage-poem' style='
                     left:{x_pos}vw; 
-                    top:{top_position}vh; 
+                    top:{y_pos}vh; 
                     animation-duration: {speed}s; 
-                    text-align: {align}; 
-                    font-family: SimHei, sans-serif; 
-                    font-size: 20px; 
-                    color: #555;'>
+                    opacity: {opacity}; 
+                    font-size: {font_size}px;
+                    font-family: SimHei, sans-serif;
+                    color: #333;'>
                     {poem}
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
+    
         st.markdown("</div>", unsafe_allow_html=True)

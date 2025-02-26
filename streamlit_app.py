@@ -89,38 +89,16 @@ if tab == "深圳记忆":
     # 空两行
     st.markdown("<br><br>", unsafe_allow_html=True)
 
-    # 虚线输入框
-    st.markdown("""
-        <div style="
-            border: 2px dashed #ccc;
-            padding: 10px;
-            text-align: center;
-            width: 80%;
-            margin: auto;
-            border-radius: 5px;
-        ">
-            <input type="text" placeholder="输入 Type" 
-                style="border: none; outline: none; width: 100%; text-align: center; font-size: 16px;">
-        </div>
-    """, unsafe_allow_html=True)
+    # 用户输入框（替代 HTML 输入框，保证 Streamlit 可读取）
+    user_input = st.text_input("", placeholder="输入 Type")
 
     # 空两行
     st.markdown("<br><br>", unsafe_allow_html=True)
 
-    # 圆形按钮
-    st.markdown("""
-        <div style="text-align: center;">
-            <button style="
-                background-color: #d3d3d3;
-                border: none;
-                border-radius: 50%;
-                width: 60px;
-                height: 60px;
-                font-size: 16px;
-                cursor: pointer;
-            ">OK</button>
-        </div>
-    """, unsafe_allow_html=True)
+    # 居中按钮
+    col1, col2, col3 = st.columns([3, 2, 3])  
+    with col2:
+        submit = st.button("OK", use_container_width=True)  
 
     # 空两行
     st.markdown("<br><br>", unsafe_allow_html=True)
@@ -132,14 +110,12 @@ if tab == "深圳记忆":
         </div>
     """, unsafe_allow_html=True)
 
-    API_KEY = st.secrets["api"]["key"]
-    API_URL = "https://api2.aigcbest.top/v1/chat/completions"
-
+    # 处理提交逻辑
     if submit:
         if not user_input.strip():
             st.warning("请输入内容后再提交！")
         else:
-            base_prompt = read_prompt()
+            base_prompt = "请根据用户的输入生成一首诗："  # 这里替换成你的实际 `read_prompt()`
             full_prompt = f"**用户输入**：\n{user_input}\n\n{base_prompt}"
 
             try:

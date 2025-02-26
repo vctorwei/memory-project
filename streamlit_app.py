@@ -280,7 +280,7 @@ elif tab == "诗歌弹幕":
                 y_pos += random.randint(-5, 5)
             used_positions.add((x_pos, y_pos))  # 记录已使用的位置
     
-            speed = random.uniform(10, 25)  # 弹幕速度
+            speed = random.uniform(10, 15)  # 弹幕速度
             opacity = random.uniform(0.6, 1)  # 透明度
             font_size = random.randint(18, 26)  # 文字大小
     

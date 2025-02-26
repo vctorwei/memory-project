@@ -90,23 +90,26 @@ if tab == "深圳记忆":
             color: #666; /* 灰色字体 */
             text-align: center;
         }
-        /* 自定义输入框 */
+        /* 让输入框容器居中 */
         div[data-testid="stTextArea"] {
             display: flex;
             justify-content: center;
         }
+        /* 让输入框本身变窄 + 居中 */
         div[data-testid="stTextArea"] textarea {
-            text-align: center; /* 输入框文字居中 */
+            width: 50% !important; /* 宽度比标题窄 50% */
+            min-height: 30px !important; /* 仅占一行 */
+            height: 30px !important;
+            max-height: 100px !important; /* 允许自适应 */
+            overflow-y: hidden !important; /* 自动扩展，无滚动条 */
+            resize: none !important; /* 禁止用户手动调整大小 */
+            text-align: center !important; /* 输入内容居中 */
             font-family: SimHei, sans-serif;
+            font-size: 16px;
             border: 2px dashed #bbb !important; /* 添加虚线边框 */
-            padding: 5px; /* 轻微内边距 */
             border-radius: 5px; /* 轻微圆角 */
-            width: 50%; /* 仅比标题宽50% */
-            min-height: 30px; /* 只占一行高度 */
-            max-height: 100px; /* 允许自适应高度 */
-            height: auto;
-            resize: none; /* 禁止用户手动调整大小 */
-            overflow-y: hidden; /* 隐藏滚动条，自动扩展 */
+            padding: 5px; /* 适当内边距 */
+            line-height: 20px !important; /* 控制单行高度 */
         }
         .button-container {
             display: flex;
@@ -163,6 +166,7 @@ if tab == "深圳记忆":
         """,
         unsafe_allow_html=True
     )
+
 
 
 

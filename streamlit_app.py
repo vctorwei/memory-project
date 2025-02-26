@@ -257,32 +257,35 @@ elif tab == "诗歌弹幕":
         screen_width = 95  # 屏幕宽度范围（vw）
         screen_height = 90  # 屏幕高度范围（vh）
     
-        # 计算均匀分布的起始点
-        spacing_x = screen_width // num_poems  # 计算横向间距
-        spacing_y = screen_height // num_poems  # 计算纵向间距
-    
-        used_positions = set()  # 存储已经使用的坐标
+        spacing_x = screen_width // num_poems  # 横向间距
+        spacing_y = screen_height // num_poems  # 纵向间距
+        used_positions = []  # 存储已占用的区域 [(x_min, x_max, y)]
     
         st.markdown("<div class='barrage-container'>", unsafe_allow_html=True)
     
         for i, poem in enumerate(random.sample(poems, num_poems)):
-            # 计算大致均匀的位置
-            base_x = i * spacing_x + random.randint(-10, 10)  # 允许小范围偏移
+            is_english = all(ord(c) < 128 for c in poem)  # 判断是否全是英文
+            base_x = i * spacing_x + random.randint(-10, 10)
             base_y = i * spacing_y + random.randint(-10, 10)
     
-            # 确保不会超出屏幕边界
-            x_pos = max(5, min(base_x, screen_width - 5))
+            # **根据文本长度调整 X 位置**
+            text_length = len(poem)
+            text_width = text_length * (8 if is_english else 18)  # 英文字符宽度较窄，需扩展
+            safe_margin = text_width // 2  # 计算安全范围
+    
+            x_pos = max(5, min(base_x, screen_width - safe_margin))
             y_pos = max(5, min(base_y, screen_height - 5))
     
-            # 防止过度重叠（若位置太接近，则重新计算）
-            while (x_pos, y_pos) in used_positions:
+            # **防止重叠**
+            while any(x_min - 5 < x_pos < x_max + 5 and abs(y - y_pos) < 5 for x_min, x_max, y in used_positions):
                 x_pos += random.randint(-5, 5)
                 y_pos += random.randint(-5, 5)
-            used_positions.add((x_pos, y_pos))  # 记录已使用的位置
     
-            speed = random.uniform(25, 45)  # 弹幕速度
-            opacity = random.uniform(0.6, 1)  # 透明度
-            font_size = random.randint(18, 26)  # 文字大小
+            used_positions.append((x_pos - safe_margin, x_pos + safe_margin, y_pos))  # 记录区域范围
+    
+            speed = random.uniform(10, 25)
+            opacity = random.uniform(0.6, 1)
+            font_size = random.randint(18, 26)
     
             st.markdown(
                 f"""

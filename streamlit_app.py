@@ -97,7 +97,7 @@ if tab == "深圳记忆":
         }
         /* 让输入框本身变窄 + 居中 */
         div[data-testid="stTextArea"] textarea {
-            width: 50% !important; /* 宽度比标题窄 50% */
+            width: 250px !important; /* 设定固定宽度，使其不会太宽 */
             min-height: 30px !important; /* 仅占一行 */
             height: 30px !important;
             max-height: 100px !important; /* 允许自适应 */
@@ -166,10 +166,6 @@ if tab == "深圳记忆":
         """,
         unsafe_allow_html=True
     )
-
-
-
-
 
     API_KEY = st.secrets["api"]["key"]
     API_URL = "https://api2.aigcbest.top/v1/chat/completions"

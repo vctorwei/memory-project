@@ -164,19 +164,29 @@ elif tab == "诗歌弹幕":
     if not poems:
         st.warning("📌 目前没有历史记录，请先在'深圳记忆'中提交诗歌！")
     else:
-        # 选择最多 5 首诗（如果有的话）
-        selected_poems = random.sample(poems, min(len(poems), 5))
+        selected_poems = random.sample(poems, min(len(poems), 5))  # 最多 5 首诗
+        top_spacing = 20  # 每首诗间隔 20vh，防止重叠
 
         # 显示弹幕效果
         st.markdown("<div class='barrage-container'>", unsafe_allow_html=True)
         for i, poem in enumerate(selected_poems):
-            x_pos = random.randint(10, 70)  # 生成随机水平位置
-            speed = random.uniform(16, 28)  # 速度变慢
+            x_pos = random.randint(10, 70)  # 随机水平位置
+            speed = random.uniform(16, 28)  # 速度
+            top_position = i * top_spacing  # 计算初始位置，防止重叠
             align = "left" if x_pos < 30 else "right" if x_pos > 60 else "center"  # 对齐方式
 
             st.markdown(
                 f"""
-                <div class='barrage-poem' style='left:{x_pos}vw; animation-duration: {speed}s; text-align: {align}; font-family: SimHei, sans-serif; font-size: 20px; color: #555;'>{poem}</div>
+                <div class='barrage-poem' style='
+                    left:{x_pos}vw; 
+                    top:{top_position}vh; 
+                    animation-duration: {speed}s; 
+                    text-align: {align}; 
+                    font-family: SimHei, sans-serif; 
+                    font-size: 20px; 
+                    color: #555;'>
+                    {poem}
+                </div>
                 """,
                 unsafe_allow_html=True,
             )

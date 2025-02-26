@@ -120,12 +120,16 @@ if tab == "深圳记忆":
     """, unsafe_allow_html=True)
 
     # 处理提交逻辑
-    if submit:
-        if not user_input.strip():
-            st.warning("请输入内容后再提交！")
-        else:
-            base_prompt = "请根据用户的输入生成一首诗："  
-            full_prompt = f"**用户输入**：\n{user_input}\n\n{base_prompt}"
+def read_prompt():
+    with open("prompt.txt", "r", encoding="utf-8") as file:
+        return file.read().strip()
+
+        if submit:
+            if not user_input.strip():
+                st.warning("请输入内容后再提交！")
+            else:
+                base_prompt = read_prompt()  # 读取 prompt.txt 作为提示词
+                full_prompt = f"**用户输入**：\n{user_input}\n\n{base_prompt}"
 
             try:
                 response = requests.post(

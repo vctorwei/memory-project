@@ -31,20 +31,14 @@ st.markdown(
             font-size: 20px;
             font-family: SimHei, sans-serif;
             color: #555;
-            animation: moveUp 20s linear infinite; /* 统一向上移动 */
+            animation: moveUp 20s linear infinite;
             white-space: pre-line;
         }
 
         /* 动画：诗歌整体向上移动 */
         @keyframes moveUp {
-            from {
-                transform: translateY(100%);
-                opacity: 1;
-            }
-            to {
-                transform: translateY(-150%);
-                opacity: 0;
-            }
+            from { transform: translateY(100%); opacity: 1; }
+            to { transform: translateY(-150%); opacity: 0; }
         }
     </style>
     """,
@@ -70,7 +64,7 @@ def read_prompt():
             return file.read().strip()
     return "【错误】未找到 prompt.txt，请检查文件是否存在！"
 
-# **函数：读取历史诗歌**
+# **函数：读取新诗歌**
 def load_new_poetry():
     if not os.path.exists(HISTORY_FILE):
         return []
@@ -186,4 +180,5 @@ elif tab == "诗歌弹幕":
         st.markdown("</div>", unsafe_allow_html=True)
 
     # **自动刷新（5 秒轮询一次）**
-    st.experimental_rerun() if "st_autorefresh" not in globals() else st_autorefresh(interval=5000)
+    from streamlit_autorefresh import st_autorefresh
+    st_autorefresh(interval=5000, key="poem_refresh")

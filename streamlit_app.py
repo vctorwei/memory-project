@@ -54,12 +54,13 @@ st.markdown(
         .circle-button {
             display: flex;
             justify-content: center;
+            align-items: center;
             margin-top: 10px;
         }
-
+        
         .circle-button button {
-            border-radius: 50%;
-            width: 60px;
+            border-radius: 50%; /* 让按钮成为圆形 */
+            width: 60px; /* 设定固定宽高 */
             height: 60px;
             background-color: gray;
             border: none;
@@ -68,7 +69,11 @@ st.markdown(
             color: white;
             font-family: "SimHei", sans-serif;
             cursor: pointer;
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
         }
+
 
         /* 居中文本 */
         .center-text {

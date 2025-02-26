@@ -79,77 +79,105 @@ def load_poetry_history():
     return []
 
 # ================== 📌 **Tab 1: 深圳记忆** ==================
+API_KEY = st.secrets["api"]["key"]
+API_URL = "https://api2.aigcbest.top/v1/chat/completions"
+HISTORY_FILE = "history.json"
+
 if tab == "深圳记忆":
-    st.markdown("""
+    # 直接渲染你的 HTML UI，保证样式不变
+    user_input = st.components.v1.html("""
         <div style="text-align: center; font-size: 24px; font-weight: bold;">
             关于你的深圳记忆<br>About Your Shenzhen Memory
         </div>
-    """, unsafe_allow_html=True)
 
-    # 空两行
-    st.markdown("<br><br>", unsafe_allow_html=True)
+        <br><br>
 
-    # 用户输入框（替代 HTML 输入框，保证 Streamlit 可读取）
-    user_input = st.text_input("", placeholder="输入 Type")
+        <div style="
+            border: 2px dashed #ccc;
+            padding: 10px;
+            text-align: center;
+            width: 80%;
+            margin: auto;
+            border-radius: 5px;
+        ">
+            <input id="memory_input" type="text" placeholder="输入 Type" 
+                style="border: none; outline: none; width: 100%; text-align: center; font-size: 16px;">
+        </div>
 
-    # 空两行
-    st.markdown("<br><br>", unsafe_allow_html=True)
+        <br><br>
 
-    # 居中按钮
-    col1, col2, col3 = st.columns([3, 2, 3])  
-    with col2:
-        submit = st.button("OK", use_container_width=True)  
+        <div style="text-align: center;">
+            <button id="submit_btn" style="
+                background-color: #d3d3d3;
+                border: none;
+                border-radius: 50%;
+                width: 60px;
+                height: 60px;
+                font-size: 16px;
+                cursor: pointer;
+            ">OK</button>
+        </div>
 
-    # 空两行
-    st.markdown("<br><br>", unsafe_allow_html=True)
+        <br><br>
 
-    # Home / 家
-    st.markdown("""
         <div style="text-align: center; font-size: 18px;">
             Home<br>家
         </div>
-    """, unsafe_allow_html=True)
 
-    # 处理提交逻辑
-    if submit:
-        if not user_input.strip():
-            st.warning("请输入内容后再提交！")
-        else:
-            base_prompt = "请根据用户的输入生成一首诗："  # 这里替换成你的实际 `read_prompt()`
-            full_prompt = f"**用户输入**：\n{user_input}\n\n{base_prompt}"
+        <script>
+            function sendData() {
+                let inputText = document.getElementById("memory_input").value;
+                if (!inputText.trim()) {
+                    alert("请输入内容后再提交！");
+                    return;
+                }
+                // 这里可以触发 Streamlit 事件
+                window.parent.postMessage({type: "submit", content: inputText}, "*");
+            }
+            document.getElementById("submit_btn").onclick = sendData;
+        </script>
+    """, height=400)
 
-            try:
-                response = requests.post(
-                    API_URL,
-                    json={"model": "gpt-4o", "messages": [{"role": "user", "content": full_prompt}]},
-                    headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"},
-                )
-                data = response.json()
-                reply = data["choices"][0]["message"]["content"].strip()
+    # 监听前端 JS 传来的输入数据
+    submit_event = st.session_state.get("submit_data", None)
 
-                # 处理文本
-                processed_text = reply.replace("，", "\n").replace("。", "\n").replace("？", "\n").replace("！", "\n").replace("：", "\n").replace("；", "\n")
-                lines = [line.strip() for line in processed_text.splitlines() if line.strip()] 
+    if submit_event:
+        user_input = submit_event  # 获取前端的输入内容
+        base_prompt = "请根据用户的输入生成一首诗："  # 这里替换成你的实际 `read_prompt()`
+        full_prompt = f"**用户输入**：\n{user_input}\n\n{base_prompt}"
 
-                # 存储
-                with open(HISTORY_FILE, "a", encoding="utf-8") as file:
-                    file.write(json.dumps({"user_input": user_input, "generated_poem": reply}, ensure_ascii=False) + "\n")
+        try:
+            response = requests.post(
+                API_URL,
+                json={"model": "gpt-4o", "messages": [{"role": "user", "content": full_prompt}]},
+                headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"},
+            )
+            data = response.json()
+            reply = data["choices"][0]["message"]["content"].strip()
 
-                # **显示诗歌**
-                st.subheader("")
-                st.markdown("<div class='poem-container'>", unsafe_allow_html=True)  
-                cols = st.columns(len(lines))  
-                for i, line in enumerate(reversed(lines)):  
-                    with cols[i]:
-                        st.markdown(
-                            f"<div class='poem-column {'first' if i == len(lines) - 1 else ''}'>{line}</div>",
-                            unsafe_allow_html=True,
-                        )
-                st.markdown("</div>", unsafe_allow_html=True)  
+            # 处理文本
+            processed_text = reply.replace("，", "\n").replace("。", "\n").replace("？", "\n").replace("！", "\n").replace("：", "\n").replace("；", "\n")
+            lines = [line.strip() for line in processed_text.splitlines() if line.strip()] 
 
-            except Exception as e:
-                st.error("请求失败，请稍后重试！")
-                st.write(e)
+            # 存储
+            with open(HISTORY_FILE, "a", encoding="utf-8") as file:
+                file.write(json.dumps({"user_input": user_input, "generated_poem": reply}, ensure_ascii=False) + "\n")
+
+            # **显示诗歌**
+            st.subheader("")
+            st.markdown("<div class='poem-container'>", unsafe_allow_html=True)  
+            cols = st.columns(len(lines))  
+            for i, line in enumerate(reversed(lines)):  
+                with cols[i]:
+                    st.markdown(
+                        f"<div class='poem-column {'first' if i == len(lines) - 1 else ''}'>{line}</div>",
+                        unsafe_allow_html=True,
+                    )
+            st.markdown("</div>", unsafe_allow_html=True)  
+
+        except Exception as e:
+            st.error("请求失败，请稍后重试！")
+            st.write(e)
 
 # ================== 📌 **Tab 2: 下载历史** ==================
 elif tab == "下载历史":

@@ -91,12 +91,22 @@ if tab == "深圳记忆":
             text-align: center;
         }
         /* 自定义输入框 */
+        div[data-testid="stTextArea"] {
+            display: flex;
+            justify-content: center;
+        }
         div[data-testid="stTextArea"] textarea {
             text-align: center; /* 输入框文字居中 */
             font-family: SimHei, sans-serif;
             border: 2px dashed #bbb !important; /* 添加虚线边框 */
-            padding: 10px; /* 增加内边距 */
+            padding: 5px; /* 轻微内边距 */
             border-radius: 5px; /* 轻微圆角 */
+            width: 50%; /* 仅比标题宽50% */
+            min-height: 30px; /* 只占一行高度 */
+            max-height: 100px; /* 允许自适应高度 */
+            height: auto;
+            resize: none; /* 禁止用户手动调整大小 */
+            overflow-y: hidden; /* 隐藏滚动条，自动扩展 */
         }
         .button-container {
             display: flex;
@@ -115,13 +125,21 @@ if tab == "深圳记忆":
             cursor: pointer;
             text-align: center;
         }
+        /* 让 Home 和 家 居中 */
+        .home-text {
+            text-align: center;
+            font-family: SimHei, sans-serif;
+            font-size: 16px;
+            color: #666;
+            margin-top: 10px;
+        }
         </style>
         <div class='title'>关于你的深圳记忆<br>About Your Shenzhen Memory</div>
         """,
         unsafe_allow_html=True
     )
 
-    # 用户输入框（虚线框）
+    # 用户输入框（窄一点，虚线框）
     user_input = st.text_area("", placeholder="输入 Type", key="memory_input")
 
     # 让提交按钮真正居中
@@ -136,6 +154,16 @@ if tab == "深圳记忆":
     """, unsafe_allow_html=True)
     
     submit = st.button("OK")
+
+    # 添加 "Home" 和 "家"，并居中
+    st.markdown(
+        """
+        <div class='home-text'>Home</div>
+        <div class='home-text'>家</div>
+        """,
+        unsafe_allow_html=True
+    )
+
 
 
 

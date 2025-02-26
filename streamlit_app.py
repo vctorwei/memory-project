@@ -173,7 +173,7 @@ elif tab == "诗歌弹幕":
         st.markdown("<div class='barrage-container'>", unsafe_allow_html=True)
         for i, poem in enumerate(selected_poems):
             x_pos = random.randint(10, 70)  # 生成随机水平位置
-            speed = random.uniform(8, 14)  # 生成随机移动速度
+            speed = random.uniform(16, 28)  # 之前是 (8, 14)，现在加倍变慢
             st.markdown(
                 f"""
                 <div class='barrage-poem' style='left:{x_pos}vw; animation-duration: {speed}s;'>{poem}</div>

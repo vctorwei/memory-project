@@ -121,9 +121,9 @@ if tab == "深圳记忆":
     user_input = st.text_area("", placeholder="输入 Type", key="memory_input")
 
     # 让提交按钮真正居中
-    col1, col2, col3 = st.columns([3, 2, 3])  # 让按钮在中间的列
-    with col2:
-        submit = st.button("OK")  # 这个会触发 if submit:
+    st.markdown("<div class='button-container'>", unsafe_allow_html=True)
+    submit = st.button("OK")
+    st.markdown("</div>", unsafe_allow_html=True)
 
     API_KEY = st.secrets["api"]["key"]
     API_URL = "https://api2.aigcbest.top/v1/chat/completions"

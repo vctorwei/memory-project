@@ -79,13 +79,18 @@ def load_poetry_history():
     return []
 
 # ================== 📌 **Tab 1: 深圳记忆** ==================
+import streamlit as st
+import requests
+import json
+from streamlit_js_eval import streamlit_js_eval
+
 API_KEY = st.secrets["api"]["key"]
 API_URL = "https://api2.aigcbest.top/v1/chat/completions"
 HISTORY_FILE = "history.json"
 
 if tab == "深圳记忆":
     # 直接渲染你的 HTML UI，保证样式不变
-    user_input = st.components.v1.html("""
+    st.markdown("""
         <div style="text-align: center; font-size: 24px; font-weight: bold;">
             关于你的深圳记忆<br>About Your Shenzhen Memory
         </div>
@@ -123,27 +128,22 @@ if tab == "深圳记忆":
         <div style="text-align: center; font-size: 18px;">
             Home<br>家
         </div>
+    """, unsafe_allow_html=True)
 
-        <script>
-            function sendData() {
-                let inputText = document.getElementById("memory_input").value;
-                if (!inputText.trim()) {
-                    alert("请输入内容后再提交！");
-                    return;
-                }
-                // 这里可以触发 Streamlit 事件
-                window.parent.postMessage({type: "submit", content: inputText}, "*");
-            }
-            document.getElementById("submit_btn").onclick = sendData;
-        </script>
-    """, height=400)
+    # 使用 streamlit_js_eval 来获取输入框的值
+    user_input = streamlit_js_eval(
+        js_expressions="document.getElementById('memory_input').value", 
+        key="user_input_js"
+    )
 
-    # 监听前端 JS 传来的输入数据
-    submit_event = st.session_state.get("submit_data", None)
+    # 监听 OK 按钮的点击
+    button_clicked = streamlit_js_eval(
+        js_expressions="document.getElementById('submit_btn').click() || false",
+        key="button_clicked_js"
+    )
 
-    if submit_event:
-        user_input = submit_event  # 获取前端的输入内容
-        base_prompt = "请根据用户的输入生成一首诗："  # 这里替换成你的实际 `read_prompt()`
+    if button_clicked and user_input.strip():
+        base_prompt = "请根据用户的输入生成一首诗："  
         full_prompt = f"**用户输入**：\n{user_input}\n\n{base_prompt}"
 
         try:
@@ -178,6 +178,7 @@ if tab == "深圳记忆":
         except Exception as e:
             st.error("请求失败，请稍后重试！")
             st.write(e)
+
 
 # ================== 📌 **Tab 2: 下载历史** ==================
 elif tab == "下载历史":

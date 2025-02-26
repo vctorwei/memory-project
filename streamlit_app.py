@@ -82,102 +82,84 @@ def load_poetry_history():
 import streamlit as st
 import requests
 import json
-from streamlit_js_eval import streamlit_js_eval
 
 API_KEY = st.secrets["api"]["key"]
 API_URL = "https://api2.aigcbest.top/v1/chat/completions"
 HISTORY_FILE = "history.json"
 
 if tab == "深圳记忆":
-    # 直接渲染你的 HTML UI，保证样式不变
+    # 标题部分
     st.markdown("""
         <div style="text-align: center; font-size: 24px; font-weight: bold;">
             关于你的深圳记忆<br>About Your Shenzhen Memory
         </div>
+    """, unsafe_allow_html=True)
 
-        <br><br>
+    # 空两行
+    st.markdown("<br><br>", unsafe_allow_html=True)
 
-        <div style="
-            border: 2px dashed #ccc;
-            padding: 10px;
-            text-align: center;
-            width: 80%;
-            margin: auto;
-            border-radius: 5px;
-        ">
-            <input id="memory_input" type="text" placeholder="输入 Type" 
-                style="border: none; outline: none; width: 100%; text-align: center; font-size: 16px;">
-        </div>
+    # Streamlit 输入框（代替 HTML 输入框，保证官方支持）
+    user_input = st.text_input("", placeholder="输入 Type")
 
-        <br><br>
+    # 空两行
+    st.markdown("<br><br>", unsafe_allow_html=True)
 
-        <div style="text-align: center;">
-            <button id="submit_btn" style="
-                background-color: #d3d3d3;
-                border: none;
-                border-radius: 50%;
-                width: 60px;
-                height: 60px;
-                font-size: 16px;
-                cursor: pointer;
-            ">OK</button>
-        </div>
+    # 按钮居中
+    col1, col2, col3 = st.columns([3, 2, 3])  
+    with col2:
+        submit = st.button("OK", use_container_width=True)  
 
-        <br><br>
+    # 空两行
+    st.markdown("<br><br>", unsafe_allow_html=True)
 
+    # Home / 家
+    st.markdown("""
         <div style="text-align: center; font-size: 18px;">
             Home<br>家
         </div>
     """, unsafe_allow_html=True)
 
-    # 使用 streamlit_js_eval 来获取输入框的值
-    user_input = streamlit_js_eval(
-        js_expressions="document.getElementById('memory_input').value", 
-        key="user_input_js"
-    )
+    # 处理提交逻辑
+    if submit:
+        if not user_input.strip():
+            st.warning("请输入内容后再提交！")
+        else:
+            base_prompt = "请根据用户的输入生成一首诗："  
+            full_prompt = f"**用户输入**：\n{user_input}\n\n{base_prompt}"
 
-    # 监听 OK 按钮的点击
-    button_clicked = streamlit_js_eval(
-        js_expressions="document.getElementById('submit_btn').click() || false",
-        key="button_clicked_js"
-    )
+            try:
+                response = requests.post(
+                    API_URL,
+                    json={"model": "gpt-4o", "messages": [{"role": "user", "content": full_prompt}]},
+                    headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"},
+                )
+                data = response.json()
+                reply = data["choices"][0]["message"]["content"].strip()
 
-    if button_clicked and user_input.strip():
-        base_prompt = "请根据用户的输入生成一首诗："  
-        full_prompt = f"**用户输入**：\n{user_input}\n\n{base_prompt}"
+                # 处理文本
+                processed_text = reply.replace("，", "\n").replace("。", "\n").replace("？", "\n").replace("！", "\n").replace("：", "\n").replace("；", "\n")
+                lines = [line.strip() for line in processed_text.splitlines() if line.strip()] 
 
-        try:
-            response = requests.post(
-                API_URL,
-                json={"model": "gpt-4o", "messages": [{"role": "user", "content": full_prompt}]},
-                headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"},
-            )
-            data = response.json()
-            reply = data["choices"][0]["message"]["content"].strip()
+                # 存储
+                with open(HISTORY_FILE, "a", encoding="utf-8") as file:
+                    file.write(json.dumps({"user_input": user_input, "generated_poem": reply}, ensure_ascii=False) + "\n")
 
-            # 处理文本
-            processed_text = reply.replace("，", "\n").replace("。", "\n").replace("？", "\n").replace("！", "\n").replace("：", "\n").replace("；", "\n")
-            lines = [line.strip() for line in processed_text.splitlines() if line.strip()] 
+                # **显示诗歌**
+                st.subheader("")
+                st.markdown("<div class='poem-container'>", unsafe_allow_html=True)  
+                cols = st.columns(len(lines))  
+                for i, line in enumerate(reversed(lines)):  
+                    with cols[i]:
+                        st.markdown(
+                            f"<div class='poem-column {'first' if i == len(lines) - 1 else ''}'>{line}</div>",
+                            unsafe_allow_html=True,
+                        )
+                st.markdown("</div>", unsafe_allow_html=True)  
 
-            # 存储
-            with open(HISTORY_FILE, "a", encoding="utf-8") as file:
-                file.write(json.dumps({"user_input": user_input, "generated_poem": reply}, ensure_ascii=False) + "\n")
+            except Exception as e:
+                st.error("请求失败，请稍后重试！")
+                st.write(e)
 
-            # **显示诗歌**
-            st.subheader("")
-            st.markdown("<div class='poem-container'>", unsafe_allow_html=True)  
-            cols = st.columns(len(lines))  
-            for i, line in enumerate(reversed(lines)):  
-                with cols[i]:
-                    st.markdown(
-                        f"<div class='poem-column {'first' if i == len(lines) - 1 else ''}'>{line}</div>",
-                        unsafe_allow_html=True,
-                    )
-            st.markdown("</div>", unsafe_allow_html=True)  
-
-        except Exception as e:
-            st.error("请求失败，请稍后重试！")
-            st.write(e)
 
 
 # ================== 📌 **Tab 2: 下载历史** ==================

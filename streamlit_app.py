@@ -4,86 +4,51 @@ import os
 import json
 import random
 
-# 设置页面布局
-st.set_page_config(page_title="关于你的深圳记忆", layout="wide", initial_sidebar_state="collapsed")
+# 设置页面布局，并默认折叠侧边栏
+st.set_page_config(page_title="深圳记忆", layout="wide", initial_sidebar_state="collapsed")
 
-# CSS 样式
+# CSS 样式 - 弹幕
 st.markdown(
     """
     <style>
-        #MainMenu, header, footer {visibility: hidden;} /* 隐藏 Streamlit 默认菜单 */
+        #MainMenu {visibility: hidden;} /* 隐藏 Streamlit 右上角菜单 */
+        header {visibility: hidden;} /* 隐藏 Streamlit 默认标题栏 */
 
-        /* 标题样式 */
-        .title {
-            text-align: center;
-            font-size: 32px;
-            font-weight: bold;
-            color: gray;
-            font-family: "SimHei", sans-serif;
-            margin-bottom: 5px;
+        /* 弹幕容器 */
+        .barrage-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* 让弹幕不会影响点击操作 */
+            overflow: hidden;
         }
 
-        .subtitle {
-            text-align: center;
-            font-size: 32px;
-            font-weight: bold;
-            color: gray;
-            font-family: "SimHei", sans-serif;
-            margin-bottom: 40px;
-        }
-
-        /* 虚线输入框样式 */
-        .dashed-input input {
-            border: 2px dashed gray !important;
-            padding: 12px;
-            text-align: center;
-            font-size: 16px;
-            width: 300px;
-            border-radius: 5px;
-            font-family: "SimHei", sans-serif;
-            margin: 0 auto;
-            display: block;
-        }
-
-        /* 居中输入框 */
-        .input-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        /* 圆形按钮 */
-        .circle-button {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 10px;
-        }
-
-        .circle-button button {
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            background-color: gray;
-            border: none;
-            font-size: 18px;
-            font-weight: bold;
-            color: white;
-            font-family: "SimHei", sans-serif;
-            cursor: pointer;
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-        }
-
-        /* 居中文本 */
-        .center-text {
+        /* 每个完整的诗歌块 */
+        .barrage-poem {
+            position: absolute;
             text-align: center;
             font-size: 24px;
-            margin-top: 30px;
             font-weight: bold;
-            color: gray;
-            font-family: "SimHei", sans-serif;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            padding: 10px;
+            white-space: pre-line;
+            opacity: 1;
+            animation: moveUp 12s linear infinite; /* 统一向上移动 */
+        }
+
+        /* 动画：诗歌整体向上移动 */
+        @keyframes moveUp {
+            from {
+                transform: translateY(100%);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-150%);
+                opacity: 0;
+            }
         }
     </style>
     """,
@@ -95,16 +60,16 @@ tab = st.sidebar.radio("选择页面", ["深圳记忆", "下载历史", "诗歌�
 
 # **历史记录文件路径**
 HISTORY_FILE = "history.txt"
-PROMPT_FILE = "prompt.txt"
+PROMPT_FILE = "prompt.txt"  # Prompt 文件路径
 
-# **读取 Prompt**
+# **函数：读取 Prompt**
 def read_prompt():
     if os.path.exists(PROMPT_FILE):
         with open(PROMPT_FILE, "r", encoding="utf-8") as file:
             return file.read().strip()
     return "【错误】未找到 prompt.txt，请检查文件是否存在！"
 
-# **读取历史诗歌**
+# **函数：读取历史诗歌**
 def load_poetry_history():
     if os.path.exists(HISTORY_FILE):
         with open(HISTORY_FILE, "r", encoding="utf-8") as file:
@@ -115,29 +80,58 @@ def load_poetry_history():
 
 # ================== 📌 **Tab 1: 深圳记忆** ==================
 if tab == "深圳记忆":
-    st.markdown("<div class='title'>关于你的深圳记忆</div>", unsafe_allow_html=True)
-    st.markdown("<div class='subtitle'>About Your Shenzhen Memory</div>", unsafe_allow_html=True)
-
-    # 空两行
-    st.write("\n\n")
+    st.markdown("<div class='title'>深圳记忆</div>", unsafe_allow_html=True)
 
     # 用户输入框
-    st.markdown('<div class="input-container">', unsafe_allow_html=True)
-    user_input = st.text_input("", placeholder="输入 Type", key="memory_input")
-    st.markdown("</div>", unsafe_allow_html=True)
+    user_input = st.text_area("", placeholder="请输入一段记忆...", key="memory_input")
 
-    # 圆形按钮
-    st.markdown('<div class="circle-button">', unsafe_allow_html=True)
-    if st.button("OK"):
-        st.success("提交成功！")
-    st.markdown("</div>", unsafe_allow_html=True)
+    # 让提交按钮居中
+    col1, col2, col3 = st.columns([3, 2, 3])  
+    with col2:
+        submit = st.button("提交", use_container_width=True)  
 
-    # 空两行
-    st.write("\n\n")
+    API_KEY = st.secrets["api"]["key"]
+    API_URL = "https://api2.aigcbest.top/v1/chat/completions"
 
-    # Home & 家
-    st.markdown("<div class='center-text'>Home</div>", unsafe_allow_html=True)
-    st.markdown("<div class='center-text'>家</div>", unsafe_allow_html=True)
+    if submit:
+        if not user_input.strip():
+            st.warning("请输入内容后再提交！")
+        else:
+            base_prompt = read_prompt()
+            full_prompt = f"**用户输入**：\n{user_input}\n\n{base_prompt}"
+
+            try:
+                response = requests.post(
+                    API_URL,
+                    json={"model": "gpt-4o", "messages": [{"role": "user", "content": full_prompt}]},
+                    headers={"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"},
+                )
+                data = response.json()
+                reply = data["choices"][0]["message"]["content"].strip()
+
+                # 处理文本
+                processed_text = reply.replace("，", "\n").replace("。", "\n").replace("？", "\n").replace("！", "\n").replace("：", "\n").replace("；", "\n")
+                lines = [line.strip() for line in processed_text.splitlines() if line.strip()] 
+
+                # 存储
+                with open(HISTORY_FILE, "a", encoding="utf-8") as file:
+                    file.write(json.dumps({"user_input": user_input, "generated_poem": reply}, ensure_ascii=False) + "\n")
+
+                # **显示诗歌**
+                st.subheader("")
+                st.markdown("<div class='poem-container'>", unsafe_allow_html=True)  
+                cols = st.columns(len(lines))  
+                for i, line in enumerate(reversed(lines)):  
+                    with cols[i]:
+                        st.markdown(
+                            f"<div class='poem-column {'first' if i == len(lines) - 1 else ''}'>{line}</div>",
+                            unsafe_allow_html=True,
+                        )
+                st.markdown("</div>", unsafe_allow_html=True)  
+
+            except Exception as e:
+                st.error("请求失败，请稍后重试！")
+                st.write(e)
 
 # ================== 📌 **Tab 2: 下载历史** ==================
 elif tab == "下载历史":
@@ -147,16 +141,19 @@ elif tab == "下载历史":
     password = st.text_input("请输入密码", type="password")
 
     if password == CORRECT_PASSWORD:
-        st.success("✅ 密码正确！")
+        st.success("✅ 密码正确！您可以下载或清空历史记录。")
 
-        if os.path.exists(HISTORY_FILE):
-            with open(HISTORY_FILE, "rb") as file:
-                st.download_button(label="📥 下载历史记录 (JSON)", data=file, file_name="history.json", mime="application/json")
+        if not os.path.exists(HISTORY_FILE):
+            with open(HISTORY_FILE, "w", encoding="utf-8") as file:
+                file.write("")  
+
+        with open(HISTORY_FILE, "rb") as file:
+            st.download_button(label="📥 下载历史记录 (JSON)", data=file, file_name="history.json", mime="application/json")
 
         if st.button("🗑️ 清空历史记录"):
-            os.remove(HISTORY_FILE)
+            os.remove(HISTORY_FILE)  
             with open(HISTORY_FILE, "w", encoding="utf-8") as file:
-                file.write("")
+                file.write("")  
             st.success("✅ 历史记录已清空！")
     elif password:
         st.error("❌ 密码错误，请重试！")
@@ -164,9 +161,33 @@ elif tab == "下载历史":
 # ================== 📌 **Tab 3: 诗歌弹幕** ==================
 elif tab == "诗歌弹幕":
     poems = load_poetry_history()
-    if poems:
-        st.markdown("<div class='barrage-container'>", unsafe_allow_html=True)
-        for poem in poems:
-            st.markdown(f"<div class='barrage-poem'>{poem}</div>", unsafe_allow_html=True)
+    if not poems:
+        st.warning("📌 目前没有历史记录，请先在'深圳记忆'中提交诗歌！")
     else:
-        st.warning("暂无诗歌记录。")
+        selected_poems = random.sample(poems, min(len(poems), 5))  # 最多 5 首诗
+        top_spacing = 20  # 每首诗间隔 20vh，防止重叠
+
+        # 显示弹幕效果
+        st.markdown("<div class='barrage-container'>", unsafe_allow_html=True)
+        for i, poem in enumerate(selected_poems):
+            x_pos = random.randint(10, 70)  # 随机水平位置
+            speed = random.uniform(16, 28)  # 速度
+            top_position = i * top_spacing  # 计算初始位置，防止重叠
+            align = "left" if x_pos < 30 else "right" if x_pos > 60 else "center"  # 对齐方式
+
+            st.markdown(
+                f"""
+                <div class='barrage-poem' style='
+                    left:{x_pos}vw; 
+                    top:{top_position}vh; 
+                    animation-duration: {speed}s; 
+                    text-align: {align}; 
+                    font-family: SimHei, sans-serif; 
+                    font-size: 20px; 
+                    color: #555;'>
+                    {poem}
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        st.markdown("</div>", unsafe_allow_html=True)

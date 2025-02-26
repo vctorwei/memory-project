@@ -121,9 +121,18 @@ if tab == "深圳记忆":
     user_input = st.text_area("", placeholder="输入 Type", key="memory_input")
 
     # 让提交按钮真正居中
-    st.markdown("<div class='button-container'>", unsafe_allow_html=True)
+    st.markdown("""
+    <style>
+    /* 让所有 st.button() 渲染的按钮都水平居中 */
+    div[data-testid="stButton"] {
+        display: flex;
+        justify-content: center;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
     submit = st.button("OK")
-    st.markdown("</div>", unsafe_allow_html=True)
+
 
     API_KEY = st.secrets["api"]["key"]
     API_URL = "https://api2.aigcbest.top/v1/chat/completions"

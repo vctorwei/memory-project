@@ -259,7 +259,7 @@ elif tab == "诗歌弹幕":
         # 显示弹幕效果
         st.markdown("<div class='barrage-container'>", unsafe_allow_html=True)
         for i, poem in enumerate(selected_poems):
-            x_pos = random.randint(10, 70)  # 随机水平位置
+            x_pos = random.randint(5, 95)  # 随机水平位置
             speed = random.uniform(16, 28)  # 速度
             top_position = i * top_spacing  # 计算初始位置，防止重叠
             align = "left" if x_pos < 30 else "right" if x_pos > 60 else "center"  # 对齐方式

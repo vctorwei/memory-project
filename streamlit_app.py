@@ -7,53 +7,7 @@ import random
 # 设置页面布局，并默认折叠侧边栏
 st.set_page_config(page_title="深圳记忆", layout="wide", initial_sidebar_state="collapsed")
 
-# CSS 样式 - 弹幕
-st.markdown(
-    """
-    <style>
-        #MainMenu {visibility: hidden;} /* 隐藏 Streamlit 右上角菜单 */
-        header {visibility: hidden;} /* 隐藏 Streamlit 默认标题栏 */
 
-        /* 弹幕容器 */
-        .barrage-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none; /* 让弹幕不会影响点击操作 */
-            overflow: hidden;
-        }
-
-        /* 每个完整的诗歌块 */
-        .barrage-poem {
-            position: absolute;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 8px;
-            padding: 10px;
-            white-space: pre-line;
-            opacity: 1;
-            animation: moveUp 12s linear infinite; /* 统一向上移动 */
-        }
-
-        /* 动画：诗歌整体向上移动 */
-        @keyframes moveUp {
-            from {
-                transform: translateY(100%);
-                opacity: 1;
-            }
-            to {
-                transform: translateY(-150%);
-                opacity: 0;
-            }
-        }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
 
 # **创建左侧 Tab 选择**
 tab = st.sidebar.radio("选择页面", ["深圳记忆", "下载历史", "诗歌弹幕"])
@@ -249,6 +203,53 @@ elif tab == "下载历史":
 
 # ================== 📌 **Tab 3: 诗歌弹幕** ==================
 elif tab == "诗歌弹幕":
+    # CSS 样式 - 弹幕
+    st.markdown(
+        """
+        <style>
+            #MainMenu {visibility: hidden;} /* 隐藏 Streamlit 右上角菜单 */
+            header {visibility: hidden;} /* 隐藏 Streamlit 默认标题栏 */
+    
+            /* 弹幕容器 */
+            .barrage-container {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none; /* 让弹幕不会影响点击操作 */
+                overflow: hidden;
+            }
+    
+            /* 每个完整的诗歌块 */
+            .barrage-poem {
+                position: absolute;
+                text-align: center;
+                font-size: 24px;
+                font-weight: bold;
+                background: rgba(255, 255, 255, 0.8);
+                border-radius: 8px;
+                padding: 10px;
+                white-space: pre-line;
+                opacity: 1;
+                animation: moveUp 12s linear infinite; /* 统一向上移动 */
+            }
+    
+            /* 动画：诗歌整体向上移动 */
+            @keyframes moveUp {
+                from {
+                    transform: translateY(100%);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateY(-150%);
+                    opacity: 0;
+                }
+            }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
     poems = load_poetry_history()
     if not poems:
         st.warning("📌 目前没有历史记录，请先在'深圳记忆'中提交诗歌！")

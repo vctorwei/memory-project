@@ -7,9 +7,12 @@ import random
 # 设置页面布局，并默认折叠侧边栏
 st.set_page_config(page_title="深圳记忆", layout="wide", initial_sidebar_state="collapsed")
 
+# **创建左侧 Tab 选择**
+tab = st.sidebar.radio("选择页面", ["深圳记忆", "下载历史", "诗歌弹幕"])
+
 # **历史记录文件路径**
 HISTORY_FILE = "history.txt"
-PROMPT_FILE = "prompt.txt"
+PROMPT_FILE = "prompt.txt"  # Prompt 文件路径
 
 # **函数：读取 Prompt**
 def read_prompt():
@@ -18,19 +21,25 @@ def read_prompt():
             return file.read().strip()
     return "【错误】未找到 prompt.txt，请检查文件是否存在！"
 
-# **创建左侧 Tab 选择**
-tab = st.sidebar.radio("选择页面", ["深圳记忆", "下载历史", "诗歌弹幕"])
-
 # ================== 📌 **Tab 1: 深圳记忆** ==================
 if tab == "深圳记忆":
-    st.markdown(
-        """
-        <style>
+    # 读取状态，决定是否进入简约模式
+    if "show_poem" not in st.session_state:
+        st.session_state.show_poem = False
+    if "memory_input" not in st.session_state:
+        st.session_state.memory_input = ""
+
+    # **如果未提交，显示输入框**
+    if not st.session_state.show_poem:
+        st.markdown(
+            """
+            <style>
             .title {
                 font-family: SimHei, sans-serif;
                 font-size: 20px;
                 color: #666;
                 text-align: center;
+                font-weight: normal;
             }
             div[data-testid="stTextArea"] {
                 display: flex;
@@ -41,6 +50,8 @@ if tab == "深圳记忆":
                 margin: auto !important;
             }
             div[data-testid="stTextArea"] textarea {
+                width: 100%;
+                min-height: 30px;
                 text-align: center;
                 border: 2px dashed #bbb;
                 border-radius: 5px;
@@ -70,28 +81,12 @@ if tab == "深圳记忆":
                 color: #666;
                 margin-top: 10px;
             }
-            .poem-container {
-                text-align: center;
-                font-family: SimHei, sans-serif;
-                font-size: 18px;
-                line-height: 1.8;
-                color: #333;
-                margin-top: 30px;
-            }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+            </style>
+            <div class='title'>关于你的深圳记忆<br>About Your Shenzhen Memory</div>
+            """,
+            unsafe_allow_html=True
+        )
 
-    # **简约模式状态**
-    if "show_poem" not in st.session_state:
-        st.session_state.show_poem = False
-    if "memory_input" not in st.session_state:
-        st.session_state.memory_input = ""
-
-    # **初始界面：输入框 + OK 按钮**
-    if not st.session_state.show_poem:
-        st.markdown("<div class='title'>关于你的深圳记忆<br>About Your Shenzhen Memory</div>", unsafe_allow_html=True)
         user_input = st.text_area("", placeholder="输入 Type", key="memory_input")
 
         submit = st.button("OK")
@@ -102,12 +97,12 @@ if tab == "深圳记忆":
             else:
                 st.session_state.memory_input = user_input
                 st.session_state.show_poem = True
-                st.rerun()  # 重新渲染页面
+                st.rerun()
 
         # 显示 Home 和 家
         st.markdown("<div class='home-text'>Home</div><div class='home-text'>家</div>", unsafe_allow_html=True)
 
-    # **简约模式：仅显示用户输入的深圳记忆和 AI 生成的诗歌**
+    # **如果 OK 被按下，显示简约模式**
     else:
         st.markdown(f"<div class='title'>{st.session_state.memory_input}</div>", unsafe_allow_html=True)
 

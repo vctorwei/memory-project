@@ -35,61 +35,65 @@ def load_poetry_history():
 # ================== 📌 **Tab 1: 深圳记忆** ==================
 if tab == "深圳记忆":
     if "submitted" not in st.session_state:
-        st.session_state.submitted = False  # 初始状态，未提交
+        st.session_state["submitted"] = False  # 追踪提交状态
 
-    if not st.session_state.submitted:  # **未提交时显示完整 UI**
+    if not st.session_state["submitted"]:
         st.markdown(
             """
             <style>
             .title {
                 font-family: SimHei, sans-serif;
-                font-size: 20px;
-                color: #666;
+                font-size: 20px; /* 字号稍小 */
+                color: #666; /* 灰色字体 */
                 text-align: center;
-                font-weight: normal;
+                font-weight: normal; /* 去掉加粗 */
             }
+            /* 让输入框整体（包含虚线框）居中 */
             div[data-testid="stTextArea"] {
                 display: flex;
                 justify-content: center;
             }
+            /* 让输入框本身（包括虚线框）变窄 + 居中 */
             div[data-testid="stTextArea"] > div {
-                width: 250px !important;
-                margin: auto !important;
+                width: 250px !important; /* 让整个输入框块变窄 */
+                margin: auto !important; /* 居中 */
             }
+            /* 修改输入框内部样式 */
             div[data-testid="stTextArea"] textarea {
-                width: 100% !important;
-                min-height: 30px !important;
+                width: 100% !important; /* 填充整个输入框块 */
+                min-height: 30px !important; /* 仅占一行 */
                 height: 30px !important;
-                max-height: 100px !important;
-                overflow-y: hidden !important;
-                resize: none !important;
-                text-align: center !important;
+                max-height: 100px !important; /* 允许自适应 */
+                overflow-y: hidden !important; /* 自动扩展，无滚动条 */
+                resize: none !important; /* 禁止用户手动调整大小 */
+                text-align: center !important; /* 输入内容居中 */
                 font-family: SimHei, sans-serif;
                 font-size: 16px;
-                border: 2px dashed #bbb !important;
-                border-radius: 5px;
-                padding: 5px;
-                line-height: 20px !important;
-                background-color: transparent !important;
+                border: 2px dashed #bbb !important; /* 添加虚线边框 */
+                border-radius: 5px; /* 轻微圆角 */
+                padding: 5px; /* 适当内边距 */
+                line-height: 20px !important; /* 控制单行高度 */
+                background-color: transparent !important; /* 让背景变透明，确保虚线明显 */
             }
             .button-container {
                 display: flex;
-                justify-content: center;
+                justify-content: center; /* 居中按钮 */
                 margin-top: 10px;
             }
             div[data-testid="stButton"] button {
-                width: 32px;
-                height: 32px;
-                border-radius: 50%;
-                background-color: #bbb !important;
+                width: 32px; /* 按钮宽度变小 */
+                height: 32px; /* 按钮高度只比字体高一倍 */
+                border-radius: 50%; /* 圆形按钮 */
+                background-color: #bbb !important; /* 灰色 */
                 color: white !important;
                 font-weight: bold;
                 font-size: 16px;
                 border: none;
                 cursor: pointer;
                 text-align: center;
-                line-height: 16px;
+                line-height: 16px; /* 让字体居中 */
             }
+            /* 让 Home 和 家 居中 */
             .home-text {
                 text-align: center;
                 font-family: SimHei, sans-serif;
@@ -99,17 +103,18 @@ if tab == "深圳记忆":
             }
             </style>
             <div class='title'>关于你的深圳记忆<br>About Your Shenzhen Memory</div>
-            <br><br><br>
+            <br><br><br> <!-- 增加三行空行 -->
             """,
             unsafe_allow_html=True
         )
 
-        # **输入框**
+        # 用户输入框
         user_input = st.text_area("", placeholder="输入 Type", key="memory_input")
 
-        # **按钮居中**
+        # 让提交按钮真正居中
         st.markdown("""
         <style>
+        /* 让所有 st.button() 渲染的按钮都水平居中 */
         div[data-testid="stButton"] {
             display: flex;
             justify-content: center;
@@ -119,7 +124,7 @@ if tab == "深圳记忆":
         
         submit = st.button("OK")
 
-        # **"Home" 和 "家"**
+        # 添加 "Home" 和 "家"，并居中
         st.markdown(
             """
             <div class='home-text'>Home</div>
@@ -128,16 +133,13 @@ if tab == "深圳记忆":
             unsafe_allow_html=True
         )
 
-        API_KEY = st.secrets["api"]["key"]
-        API_URL = "https://api2.aigcbest.top/v1/chat/completions"
-
-        if submit:  
+        if submit:  # 监听按钮点击事件
             if not user_input.strip():
                 st.warning("请输入内容后再提交！")
             else:
-                st.session_state.submitted = True  # **标记已提交**
-                st.session_state.user_memory = user_input  # **存储用户输入**
-                
+                API_KEY = st.secrets["api"]["key"]
+                API_URL = "https://api2.aigcbest.top/v1/chat/completions"
+
                 base_prompt = read_prompt()
                 full_prompt = f"**用户输入**：\n{user_input}\n\n{base_prompt}"
 
@@ -150,48 +152,55 @@ if tab == "深圳记忆":
                     data = response.json()
                     reply = data["choices"][0]["message"]["content"].strip()
 
-                    # **处理诗歌格式**
+                    # 处理文本
                     processed_text = reply.replace("，", "\n").replace("。", "\n").replace("？", "\n").replace("！", "\n").replace("：", "\n").replace("；", "\n")
                     lines = [line.strip() for line in processed_text.splitlines() if line.strip()] 
 
-                    # **存储数据**
-                    st.session_state.generated_poem = lines
-
+                    # 存储
                     with open(HISTORY_FILE, "a", encoding="utf-8") as file:
                         file.write(json.dumps({"user_input": user_input, "generated_poem": reply}, ensure_ascii=False) + "\n")
+
+                    # 记录状态，进入简约模式
+                    st.session_state["submitted"] = True
+                    st.session_state["user_memory"] = user_input
+                    st.session_state["generated_poem"] = lines
 
                 except Exception as e:
                     st.error("请求失败，请稍后重试！")
                     st.write(e)
 
-    else:  # **提交后，仅显示记忆和诗歌**
+    else:
+        # 简约模式，只显示用户输入的记忆和诗歌
         st.markdown(
-            f"""
+            """
             <style>
-            .simple-title {{
+            .memory-text {
+                text-align: center;
                 font-family: SimHei, sans-serif;
-                font-size: 24px;
-                color: #444;
-                text-align: center;
-                font-weight: bold;
-            }}
-            .poem-container {{
-                margin-top: 20px;
-                text-align: center;
                 font-size: 18px;
-                font-family: SimHei, sans-serif;
                 color: #333;
-                line-height: 1.8;
-            }}
+                margin-bottom: 20px;
+                font-weight: bold;
+            }
+            .poem-container {
+                text-align: center;
+                font-family: SimHei, sans-serif;
+                font-size: 16px;
+                color: #444;
+            }
             </style>
-            <div class='simple-title'>{st.session_state.user_memory}</div>
-            <br>
-            <div class='poem-container'>
-                {"<br>".join(st.session_state.generated_poem)}
-            </div>
             """,
             unsafe_allow_html=True
         )
+
+        # 显示用户输入的记忆
+        st.markdown(f"<div class='memory-text'>{st.session_state['user_memory']}</div>", unsafe_allow_html=True)
+
+        # 显示生成的诗歌
+        st.markdown("<div class='poem-container'>", unsafe_allow_html=True)
+        for line in st.session_state["generated_poem"]:
+            st.markdown(f"<p>{line}</p>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
 
 # ================== 📌 **Tab 2: 下载历史** ==================

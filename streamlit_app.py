@@ -18,16 +18,7 @@ def read_prompt():
             return file.read().strip()
     return "【错误】未找到 prompt.txt，请检查文件是否存在！"
 
-# **函数：读取历史诗歌**
-def load_poetry_history():
-    if os.path.exists(HISTORY_FILE):
-        with open(HISTORY_FILE, "r", encoding="utf-8") as file:
-            lines = file.readlines()
-            poems = [json.loads(line)["generated_poem"] for line in lines if line.strip()]
-            return poems
-    return []
-
-# **创建侧边栏 Tab 选择**
+# **创建左侧 Tab 选择**
 tab = st.sidebar.radio("选择页面", ["深圳记忆", "下载历史", "诗歌弹幕"])
 
 # ================== 📌 **Tab 1: 深圳记忆** ==================
@@ -40,6 +31,44 @@ if tab == "深圳记忆":
                 font-size: 20px;
                 color: #666;
                 text-align: center;
+            }
+            div[data-testid="stTextArea"] {
+                display: flex;
+                justify-content: center;
+            }
+            div[data-testid="stTextArea"] > div {
+                width: 250px !important;
+                margin: auto !important;
+            }
+            div[data-testid="stTextArea"] textarea {
+                text-align: center;
+                border: 2px dashed #bbb;
+                border-radius: 5px;
+                font-family: SimHei, sans-serif;
+                font-size: 16px;
+                padding: 5px;
+            }
+            .button-container {
+                display: flex;
+                justify-content: center;
+                margin-top: 10px;
+            }
+            div[data-testid="stButton"] button {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background-color: #bbb;
+                color: white;
+                font-weight: bold;
+                font-size: 16px;
+                border: none;
+            }
+            .home-text {
+                text-align: center;
+                font-family: SimHei, sans-serif;
+                font-size: 16px;
+                color: #666;
+                margin-top: 10px;
             }
             .poem-container {
                 text-align: center;
@@ -60,7 +89,7 @@ if tab == "深圳记忆":
     if "memory_input" not in st.session_state:
         st.session_state.memory_input = ""
 
-    # **如果是初始状态（未提交），显示输入框**
+    # **初始界面：输入框 + OK 按钮**
     if not st.session_state.show_poem:
         st.markdown("<div class='title'>关于你的深圳记忆<br>About Your Shenzhen Memory</div>", unsafe_allow_html=True)
         user_input = st.text_area("", placeholder="输入 Type", key="memory_input")
@@ -78,7 +107,7 @@ if tab == "深圳记忆":
         # 显示 Home 和 家
         st.markdown("<div class='home-text'>Home</div><div class='home-text'>家</div>", unsafe_allow_html=True)
 
-    # **如果 OK 被按下，显示简约页面**
+    # **简约模式：仅显示用户输入的深圳记忆和 AI 生成的诗歌**
     else:
         st.markdown(f"<div class='title'>{st.session_state.memory_input}</div>", unsafe_allow_html=True)
 
@@ -97,11 +126,11 @@ if tab == "深圳记忆":
             data = response.json()
             reply = data["choices"][0]["message"]["content"].strip()
 
-            # 处理文本换行
+            # **处理诗歌格式**
             processed_text = reply.replace("，", "\n").replace("。", "\n").replace("？", "\n").replace("！", "\n").replace("：", "\n").replace("；", "\n")
             lines = [line.strip() for line in processed_text.splitlines() if line.strip()]
 
-            # 存储历史记录
+            # **存储历史记录**
             with open(HISTORY_FILE, "a", encoding="utf-8") as file:
                 file.write(json.dumps({"user_input": st.session_state.memory_input, "generated_poem": reply}, ensure_ascii=False) + "\n")
 
@@ -115,7 +144,7 @@ if tab == "深圳记忆":
             st.error("请求失败，请稍后重试！")
             st.write(e)
 
-# ================== 📌 **Tab 2: 下载历史** ==================
+# ================== 📌 **Tab 2: 下载历史**（不变）
 elif tab == "下载历史":
     st.markdown("<div class='title'>🔐 下载历史</div>", unsafe_allow_html=True)
 
@@ -140,7 +169,7 @@ elif tab == "下载历史":
     elif password:
         st.error("❌ 密码错误，请重试！")
 
-# ================== 📌 **Tab 3: 诗歌弹幕** ==================
+# ================== 📌 **Tab 3: 诗歌弹幕**（不变）
 elif tab == "诗歌弹幕":
     poems = load_poetry_history()
     if not poems:
@@ -150,22 +179,6 @@ elif tab == "诗歌弹幕":
         st.markdown("<div class='barrage-container'>", unsafe_allow_html=True)
     
         for poem in random.sample(poems, num_poems):
-            speed = random.uniform(25, 45)
-            opacity = random.uniform(0.6, 1)
-            font_size = random.randint(18, 26)
-
-            st.markdown(
-                f"""
-                <div class='barrage-poem' style='
-                    animation-duration: {speed}s;
-                    opacity: {opacity};
-                    font-size: {font_size}px;
-                    font-family: SimHei, sans-serif;
-                    color: #333;'>
-                    {poem}
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+            st.markdown(f"<div class='barrage-poem'>{poem}</div>", unsafe_allow_html=True)
     
         st.markdown("</div>", unsafe_allow_html=True)

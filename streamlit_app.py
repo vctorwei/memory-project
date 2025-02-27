@@ -85,6 +85,13 @@ if tab == "深圳记忆":
             text-align: center;
             line-height: 16px;
         }
+        .home-text {
+            text-align: center;
+            font-family: SimHei, sans-serif;
+            font-size: 16px;
+            color: #666;
+            margin-top: 10px;
+        }
         .memory-text {
             text-align: center;
             font-family: SimHei, sans-serif;
@@ -102,6 +109,8 @@ if tab == "深圳记忆":
             white-space: pre-line;
         }
         </style>
+        <div class='title'>关于你的深圳记忆<br>About Your Shenzhen Memory</div>
+        <br><br><br>
         """,
         unsafe_allow_html=True
     )
@@ -164,8 +173,15 @@ if tab == "深圳记忆":
 
     else:
         # **切换到简约模式**
-        st.markdown(f"<div class='memory-text'>{st.session_state['memory']}</div>", unsafe_allow_html=True)
-        st.markdown(f"<div class='poem-container'>{st.session_state['poem']}</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"""
+            <div class='title'>关于你的深圳记忆<br>About Your Shenzhen Memory</div>
+            <br><br><br>
+            <div class='memory-text'>{st.session_state['memory']}</div>
+            <div class='poem-container'>{st.session_state['poem']}</div>
+            """,
+            unsafe_allow_html=True
+        )
 
 
 # ================== 📌 **Tab 2: 下载历史** ==================

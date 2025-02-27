@@ -268,7 +268,7 @@ elif tab == "诗歌弹幕":
     if not poems:
         st.warning("📌 目前没有历史记录，请先在'深圳记忆'中提交诗歌！")
     else:
-        num_poems = min(len(poems), 10)  # 最多 10 条弹幕
+        num_poems = min(len(poems), 5)  # 最多 10 条弹幕
         screen_width = 95  # 屏幕宽度范围（vw）
         screen_height = 90  # 屏幕高度范围（vh）
     

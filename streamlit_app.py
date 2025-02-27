@@ -37,6 +37,12 @@ if tab == "深圳记忆":
     st.markdown(
         """
         <style>
+        /* 隐藏 Streamlit 默认 UI */
+        header, footer {visibility: hidden !important;}
+        div[data-testid="stToolbar"] { display: none !important; }
+        div[data-testid="stStatusWidget"] { display: none !important; }
+
+        /* 标题样式 */
         .title {
             font-family: SimHei, sans-serif;
             font-size: 20px;
@@ -44,14 +50,17 @@ if tab == "深圳记忆":
             text-align: center;
             font-weight: normal;
         }
+        /* 让输入框整体居中 */
         div[data-testid="stTextArea"] {
             display: flex;
             justify-content: center;
         }
+        /* 让输入框本身变窄 + 居中 */
         div[data-testid="stTextArea"] > div {
             width: 250px !important;
             margin: auto !important;
         }
+        /* 输入框内部样式 */
         div[data-testid="stTextArea"] textarea {
             width: 100% !important;
             min-height: 30px !important;
@@ -68,6 +77,7 @@ if tab == "深圳记忆":
             line-height: 20px !important;
             background-color: transparent !important;
         }
+        /* 让 OK 按钮居中 */
         div[data-testid="stButton"] {
             display: flex;
             justify-content: center;
@@ -85,6 +95,7 @@ if tab == "深圳记忆":
             text-align: center;
             line-height: 16px;
         }
+        /* Home 和 家 居中 */
         .home-text {
             text-align: center;
             font-family: SimHei, sans-serif;
@@ -92,6 +103,7 @@ if tab == "深圳记忆":
             color: #666;
             margin-top: 10px;
         }
+        /* 记忆文本样式 */
         .memory-text {
             text-align: center;
             font-family: SimHei, sans-serif;
@@ -100,6 +112,7 @@ if tab == "深圳记忆":
             color: #333;
             margin-top: 30px;
         }
+        /* 诗歌容器 */
         .poem-container {
             text-align: center;
             font-family: SimHei, sans-serif;
@@ -124,7 +137,7 @@ if tab == "深圳记忆":
 
         submit = st.button("OK")
 
-        # "Home" 和 "家" 保持在 OK 之前的界面
+        # Home/家 显示
         st.markdown(
             """
             <div class='home-text'>Home</div>
@@ -175,7 +188,6 @@ if tab == "深圳记忆":
         # **按下 OK 之后，页面变简约**
         st.markdown(f"<div class='memory-text'>{st.session_state['memory']}</div>", unsafe_allow_html=True)
         st.markdown(f"<div class='poem-container'>{st.session_state['poem']}</div>", unsafe_allow_html=True)
-
 
 
 # ================== 📌 **Tab 2: 下载历史** ==================

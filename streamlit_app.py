@@ -34,97 +34,92 @@ def load_poetry_history():
 
 # ================== 📌 **Tab 1: 深圳记忆** ==================
 if tab == "深圳记忆":
-    st.markdown(
-        """
+    if "submitted" not in st.session_state:
+        st.session_state.submitted = False  # 初始状态，未提交
+
+    if not st.session_state.submitted:  # **未提交时显示完整 UI**
+        st.markdown(
+            """
+            <style>
+            .title {
+                font-family: SimHei, sans-serif;
+                font-size: 20px;
+                color: #666;
+                text-align: center;
+                font-weight: normal;
+            }
+            div[data-testid="stTextArea"] {
+                display: flex;
+                justify-content: center;
+            }
+            div[data-testid="stTextArea"] > div {
+                width: 250px !important;
+                margin: auto !important;
+            }
+            div[data-testid="stTextArea"] textarea {
+                width: 100% !important;
+                min-height: 30px !important;
+                height: 30px !important;
+                max-height: 100px !important;
+                overflow-y: hidden !important;
+                resize: none !important;
+                text-align: center !important;
+                font-family: SimHei, sans-serif;
+                font-size: 16px;
+                border: 2px dashed #bbb !important;
+                border-radius: 5px;
+                padding: 5px;
+                line-height: 20px !important;
+                background-color: transparent !important;
+            }
+            .button-container {
+                display: flex;
+                justify-content: center;
+                margin-top: 10px;
+            }
+            div[data-testid="stButton"] button {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background-color: #bbb !important;
+                color: white !important;
+                font-weight: bold;
+                font-size: 16px;
+                border: none;
+                cursor: pointer;
+                text-align: center;
+                line-height: 16px;
+            }
+            .home-text {
+                text-align: center;
+                font-family: SimHei, sans-serif;
+                font-size: 16px;
+                color: #666;
+                margin-top: 10px;
+            }
+            </style>
+            <div class='title'>关于你的深圳记忆<br>About Your Shenzhen Memory</div>
+            <br><br><br>
+            """,
+            unsafe_allow_html=True
+        )
+
+        # **输入框**
+        user_input = st.text_area("", placeholder="输入 Type", key="memory_input")
+
+        # **按钮居中**
+        st.markdown("""
         <style>
-        .title {
-            font-family: SimHei, sans-serif;
-            font-size: 20px;
-            color: #666;
-            text-align: center;
-            font-weight: normal;
-        }
-        div[data-testid="stTextArea"] {
-            display: flex;
-            justify-content: center;
-        }
-        div[data-testid="stTextArea"] > div {
-            width: 250px !important;
-            margin: auto !important;
-        }
-        div[data-testid="stTextArea"] textarea {
-            width: 100% !important;
-            min-height: 30px !important;
-            height: 30px !important;
-            max-height: 100px !important;
-            overflow-y: hidden !important;
-            resize: none !important;
-            text-align: center !important;
-            font-family: SimHei, sans-serif;
-            font-size: 16px;
-            border: 2px dashed #bbb !important;
-            border-radius: 5px;
-            padding: 5px;
-            line-height: 20px !important;
-            background-color: transparent !important;
-        }
         div[data-testid="stButton"] {
             display: flex;
             justify-content: center;
         }
-        div[data-testid="stButton"] button {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: #bbb !important;
-            color: white !important;
-            font-weight: bold;
-            font-size: 16px;
-            border: none;
-            cursor: pointer;
-            text-align: center;
-            line-height: 16px;
-        }
-        .home-text {
-            text-align: center;
-            font-family: SimHei, sans-serif;
-            font-size: 16px;
-            color: #666;
-            margin-top: 10px;
-        }
-        .memory-text {
-            text-align: center;
-            font-family: SimHei, sans-serif;
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-            margin-top: 30px;
-        }
-        .poem-container {
-            text-align: center;
-            font-family: SimHei, sans-serif;
-            font-size: 16px;
-            color: #444;
-            margin-top: 20px;
-            white-space: pre-line;
-        }
         </style>
-        <div class='title'>关于你的深圳记忆<br>About Your Shenzhen Memory</div>
-        <br><br><br>
-        """,
-        unsafe_allow_html=True
-    )
-
-    # 记录页面状态
-    if "submitted" not in st.session_state:
-        st.session_state["submitted"] = False
-
-    if not st.session_state["submitted"]:
-        # 用户输入框
-        user_input = st.text_area("", placeholder="输入 Type", key="memory_input")
-
+        """, unsafe_allow_html=True)
+        
         submit = st.button("OK")
 
+        # **"Home" 和 "家"**
         st.markdown(
             """
             <div class='home-text'>Home</div>
@@ -136,10 +131,13 @@ if tab == "深圳记忆":
         API_KEY = st.secrets["api"]["key"]
         API_URL = "https://api2.aigcbest.top/v1/chat/completions"
 
-        if submit:
+        if submit:  
             if not user_input.strip():
                 st.warning("请输入内容后再提交！")
             else:
+                st.session_state.submitted = True  # **标记已提交**
+                st.session_state.user_memory = user_input  # **存储用户输入**
+                
                 base_prompt = read_prompt()
                 full_prompt = f"**用户输入**：\n{user_input}\n\n{base_prompt}"
 
@@ -152,33 +150,45 @@ if tab == "深圳记忆":
                     data = response.json()
                     reply = data["choices"][0]["message"]["content"].strip()
 
-                    # 格式化诗歌
+                    # **处理诗歌格式**
                     processed_text = reply.replace("，", "\n").replace("。", "\n").replace("？", "\n").replace("！", "\n").replace("：", "\n").replace("；", "\n")
-                    lines = [line.strip() for line in processed_text.splitlines() if line.strip()]
+                    lines = [line.strip() for line in processed_text.splitlines() if line.strip()] 
 
-                    # 存储
+                    # **存储数据**
+                    st.session_state.generated_poem = lines
+
                     with open(HISTORY_FILE, "a", encoding="utf-8") as file:
                         file.write(json.dumps({"user_input": user_input, "generated_poem": reply}, ensure_ascii=False) + "\n")
-
-                    # 保存状态
-                    st.session_state["submitted"] = True
-                    st.session_state["memory"] = user_input
-                    st.session_state["poem"] = "\n".join(lines)
-
-                    st.rerun()
 
                 except Exception as e:
                     st.error("请求失败，请稍后重试！")
                     st.write(e)
 
-    else:
-        # **切换到简约模式**
+    else:  # **提交后，仅显示记忆和诗歌**
         st.markdown(
             f"""
-            <div class='title'>关于你的深圳记忆<br>About Your Shenzhen Memory</div>
-            <br><br><br>
-            <div class='memory-text'>{st.session_state['memory']}</div>
-            <div class='poem-container'>{st.session_state['poem']}</div>
+            <style>
+            .simple-title {{
+                font-family: SimHei, sans-serif;
+                font-size: 24px;
+                color: #444;
+                text-align: center;
+                font-weight: bold;
+            }}
+            .poem-container {{
+                margin-top: 20px;
+                text-align: center;
+                font-size: 18px;
+                font-family: SimHei, sans-serif;
+                color: #333;
+                line-height: 1.8;
+            }}
+            </style>
+            <div class='simple-title'>{st.session_state.user_memory}</div>
+            <br>
+            <div class='poem-container'>
+                {"<br>".join(st.session_state.generated_poem)}
+            </div>
             """,
             unsafe_allow_html=True
         )

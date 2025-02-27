@@ -34,97 +34,97 @@ def load_poetry_history():
 
 # ================== 📌 **Tab 1: 深圳记忆** ==================
 if tab == "深圳记忆":
-    if "submitted" not in st.session_state:
-        st.session_state["submitted"] = False  # 追踪提交状态
-
-    if not st.session_state["submitted"]:
-        st.markdown(
-            """
-            <style>
-            .title {
-                font-family: SimHei, sans-serif;
-                font-size: 20px; /* 字号稍小 */
-                color: #666; /* 灰色字体 */
-                text-align: center;
-                font-weight: normal; /* 去掉加粗 */
-            }
-            /* 让输入框整体（包含虚线框）居中 */
-            div[data-testid="stTextArea"] {
-                display: flex;
-                justify-content: center;
-            }
-            /* 让输入框本身（包括虚线框）变窄 + 居中 */
-            div[data-testid="stTextArea"] > div {
-                width: 250px !important; /* 让整个输入框块变窄 */
-                margin: auto !important; /* 居中 */
-            }
-            /* 修改输入框内部样式 */
-            div[data-testid="stTextArea"] textarea {
-                width: 100% !important; /* 填充整个输入框块 */
-                min-height: 30px !important; /* 仅占一行 */
-                height: 30px !important;
-                max-height: 100px !important; /* 允许自适应 */
-                overflow-y: hidden !important; /* 自动扩展，无滚动条 */
-                resize: none !important; /* 禁止用户手动调整大小 */
-                text-align: center !important; /* 输入内容居中 */
-                font-family: SimHei, sans-serif;
-                font-size: 16px;
-                border: 2px dashed #bbb !important; /* 添加虚线边框 */
-                border-radius: 5px; /* 轻微圆角 */
-                padding: 5px; /* 适当内边距 */
-                line-height: 20px !important; /* 控制单行高度 */
-                background-color: transparent !important; /* 让背景变透明，确保虚线明显 */
-            }
-            .button-container {
-                display: flex;
-                justify-content: center; /* 居中按钮 */
-                margin-top: 10px;
-            }
-            div[data-testid="stButton"] button {
-                width: 32px; /* 按钮宽度变小 */
-                height: 32px; /* 按钮高度只比字体高一倍 */
-                border-radius: 50%; /* 圆形按钮 */
-                background-color: #bbb !important; /* 灰色 */
-                color: white !important;
-                font-weight: bold;
-                font-size: 16px;
-                border: none;
-                cursor: pointer;
-                text-align: center;
-                line-height: 16px; /* 让字体居中 */
-            }
-            /* 让 Home 和 家 居中 */
-            .home-text {
-                text-align: center;
-                font-family: SimHei, sans-serif;
-                font-size: 16px;
-                color: #666;
-                margin-top: 10px;
-            }
-            </style>
-            <div class='title'>关于你的深圳记忆<br>About Your Shenzhen Memory</div>
-            <br><br><br> <!-- 增加三行空行 -->
-            """,
-            unsafe_allow_html=True
-        )
-
-        # 用户输入框
-        user_input = st.text_area("", placeholder="输入 Type", key="memory_input")
-
-        # 让提交按钮真正居中
-        st.markdown("""
+    st.markdown(
+        """
         <style>
-        /* 让所有 st.button() 渲染的按钮都水平居中 */
+        .title {
+            font-family: SimHei, sans-serif;
+            font-size: 20px;
+            color: #666;
+            text-align: center;
+            font-weight: normal;
+        }
+        div[data-testid="stTextArea"] {
+            display: flex;
+            justify-content: center;
+        }
+        div[data-testid="stTextArea"] > div {
+            width: 250px !important;
+            margin: auto !important;
+        }
+        div[data-testid="stTextArea"] textarea {
+            width: 100% !important;
+            min-height: 30px !important;
+            height: 30px !important;
+            max-height: 100px !important;
+            overflow-y: hidden !important;
+            resize: none !important;
+            text-align: center !important;
+            font-family: SimHei, sans-serif;
+            font-size: 16px;
+            border: 2px dashed #bbb !important;
+            border-radius: 5px;
+            padding: 5px;
+            line-height: 20px !important;
+            background-color: transparent !important;
+        }
         div[data-testid="stButton"] {
             display: flex;
             justify-content: center;
         }
+        div[data-testid="stButton"] button {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #bbb !important;
+            color: white !important;
+            font-weight: bold;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            line-height: 16px;
+        }
+        .home-text {
+            text-align: center;
+            font-family: SimHei, sans-serif;
+            font-size: 16px;
+            color: #666;
+            margin-top: 10px;
+        }
+        .memory-text {
+            text-align: center;
+            font-family: SimHei, sans-serif;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 30px;
+        }
+        .poem-container {
+            text-align: center;
+            font-family: SimHei, sans-serif;
+            font-size: 16px;
+            color: #444;
+            margin-top: 20px;
+            white-space: pre-line;
+        }
         </style>
-        """, unsafe_allow_html=True)
-        
+        <div class='title'>关于你的深圳记忆<br>About Your Shenzhen Memory</div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # 记录页面状态
+    if "submitted" not in st.session_state:
+        st.session_state["submitted"] = False
+
+    if not st.session_state["submitted"]:
+        # **按下 OK 之前，页面保持原样**
+        user_input = st.text_area("", placeholder="输入 Type", key="memory_input")
+
         submit = st.button("OK")
 
-        # 添加 "Home" 和 "家"，并居中
+        # "Home" 和 "家" 保持在 OK 之前的界面
         st.markdown(
             """
             <div class='home-text'>Home</div>
@@ -133,13 +133,13 @@ if tab == "深圳记忆":
             unsafe_allow_html=True
         )
 
-        if submit:  # 监听按钮点击事件
+        API_KEY = st.secrets["api"]["key"]
+        API_URL = "https://api2.aigcbest.top/v1/chat/completions"
+
+        if submit:
             if not user_input.strip():
                 st.warning("请输入内容后再提交！")
             else:
-                API_KEY = st.secrets["api"]["key"]
-                API_URL = "https://api2.aigcbest.top/v1/chat/completions"
-
                 base_prompt = read_prompt()
                 full_prompt = f"**用户输入**：\n{user_input}\n\n{base_prompt}"
 
@@ -152,55 +152,30 @@ if tab == "深圳记忆":
                     data = response.json()
                     reply = data["choices"][0]["message"]["content"].strip()
 
-                    # 处理文本
+                    # 格式化诗歌
                     processed_text = reply.replace("，", "\n").replace("。", "\n").replace("？", "\n").replace("！", "\n").replace("：", "\n").replace("；", "\n")
-                    lines = [line.strip() for line in processed_text.splitlines() if line.strip()] 
+                    lines = [line.strip() for line in processed_text.splitlines() if line.strip()]
 
                     # 存储
                     with open(HISTORY_FILE, "a", encoding="utf-8") as file:
                         file.write(json.dumps({"user_input": user_input, "generated_poem": reply}, ensure_ascii=False) + "\n")
 
-                    # 记录状态，进入简约模式
+                    # 保存状态
                     st.session_state["submitted"] = True
-                    st.session_state["user_memory"] = user_input
-                    st.session_state["generated_poem"] = lines
+                    st.session_state["memory"] = user_input
+                    st.session_state["poem"] = "\n".join(lines)
+
+                    st.rerun()
 
                 except Exception as e:
                     st.error("请求失败，请稍后重试！")
                     st.write(e)
 
     else:
-        # 简约模式，只显示用户输入的记忆和诗歌
-        st.markdown(
-            """
-            <style>
-            .memory-text {
-                text-align: center;
-                font-family: SimHei, sans-serif;
-                font-size: 18px;
-                color: #333;
-                margin-bottom: 20px;
-                font-weight: bold;
-            }
-            .poem-container {
-                text-align: center;
-                font-family: SimHei, sans-serif;
-                font-size: 16px;
-                color: #444;
-            }
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
+        # **按下 OK 之后，页面变简约**
+        st.markdown(f"<div class='memory-text'>{st.session_state['memory']}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='poem-container'>{st.session_state['poem']}</div>", unsafe_allow_html=True)
 
-        # 显示用户输入的记忆
-        st.markdown(f"<div class='memory-text'>{st.session_state['user_memory']}</div>", unsafe_allow_html=True)
-
-        # 显示生成的诗歌
-        st.markdown("<div class='poem-container'>", unsafe_allow_html=True)
-        for line in st.session_state["generated_poem"]:
-            st.markdown(f"<p>{line}</p>", unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
 
 
 # ================== 📌 **Tab 2: 下载历史** ==================

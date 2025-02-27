@@ -7,7 +7,13 @@ import random
 # 设置页面布局，并默认折叠侧边栏
 st.set_page_config(page_title="深圳记忆", layout="wide", initial_sidebar_state="collapsed")
 
-
+# 全局隐藏 header 和 footer
+st.markdown("""
+    <style>
+    header {visibility: hidden !important;}
+    footer {visibility: hidden !important;}
+    </style>
+""", unsafe_allow_html=True)
 
 # **创建左侧 Tab 选择**
 tab = st.sidebar.radio("选择页面", ["深圳记忆", "下载历史", "诗歌弹幕"])
